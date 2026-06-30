@@ -53,6 +53,10 @@ public class MainWindow extends JPanel {
         return user;
     }
 
+    public AppFrame getAppFrame() {
+        return appFrame;
+    }
+
     // ---- sidebar ----
 
     private JPanel buildSidebar() {
@@ -171,7 +175,12 @@ public class MainWindow extends JPanel {
 
     public void showProfile() {
         setActive("profile");
-        setContent(new Placeholder("Profile"));
+        setContent(new ProfilePanel(this, user));
+    }
+
+    public void showSettings() {
+        setActive("profile");
+        setContent(new Placeholder("Settings"));
     }
 
     // open a single community page
