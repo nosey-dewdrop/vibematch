@@ -1,49 +1,55 @@
 # vibematch
 
 ## Status
-Current phase: Foundation
-Last session: 2026-06-30 — repo created, scaffolding + roadmap set up.
+Current phase: Core done, heading into Polish
+Last session: 2026-06-30 — whole Phase 1 desktop app built end to end and tested.
 
 ## Roadmap
 
 ### Phase 1: Foundation
-- [ ] project setup (readme, gitignore, run.sh)
-- [ ] theme / app constants (lilac palette, fonts)
-- [ ] sqlite db layer + schema
-- [ ] model classes (User, Community, Post, Comment, Message, MbtiResult)
-- [ ] password hashing + validation utils
+- [x] project setup (readme, gitignore, run.sh)
+- [x] theme / app constants (lilac palette, fonts)
+- [x] sqlite db layer + schema
+- [x] model classes (User, Community, Post, Comment, Message, MbtiResult)
+- [x] password hashing + validation utils
 
 ### Phase 2: Auth
-- [ ] user dao + auth service
-- [ ] email sender (smtp + popup fallback)
-- [ ] login screen
-- [ ] register + email verify screens
+- [x] user dao + auth service
+- [x] email sender (smtp + popup fallback)
+- [x] login screen
+- [x] register + email verify screens
 
 ### Phase 3: Onboarding
-- [ ] interest selection
-- [ ] mbti service + 16 question test
-- [ ] vibe result screen (archetype + bars)
+- [x] interest selection
+- [x] mbti service + 16 question test
+- [x] vibe result screen (archetype + bars)
 
 ### Phase 4: Communities
-- [ ] community dao + service + seed data
-- [ ] match service (interest + mbti scoring)
-- [ ] home feed (matched communities)
-- [ ] discover / search
-- [ ] community detail (join / leave)
+- [x] community dao + service + seed data
+- [x] match service (interest + mbti scoring)
+- [x] home feed (matched communities)
+- [x] discover / search
+- [x] community detail (join / leave)
 
 ### Phase 5: Forum + Messages
-- [ ] post dao + post detail (threaded comments) + new post
-- [ ] my communities
-- [ ] message dao + 1 on 1 dm panel
+- [x] post dao + post detail (threaded comments) + new post
+- [x] my communities
+- [x] message dao + 1 on 1 dm panel
 
 ### Phase 6: Profile + Polish
-- [ ] profile (edit interests / retake mbti, stats)
-- [ ] settings + logout
-- [ ] polish pass, empty states, edge cases
+- [x] profile (edit interests / retake mbti, stats)
+- [x] settings + logout
+- [ ] polish pass, empty states, edge cases (run it and click through)
 
 ### Phase 7: iOS (later)
 - [ ] expose data layer through a small local backend
 - [ ] swiftui client
+
+## How to run
+`./run.sh` from the project root. First run seeds sample communities + people.
+Demo logins (password `vibe1234`): ada, mert, zeynep, can, elif — all
+@ug.bilkent.edu.tr. Or register a fresh account (the email code shows in a popup
+if no SMTP is set up).
 
 ## Ideas
 - "people you might vibe with" list on discover, using the same match scoring
