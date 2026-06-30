@@ -67,8 +67,7 @@ public class AppFrame extends JFrame {
     }
 
     public void showVibeResult(User user, model.MbtiResult result) {
-        // result screen comes next
-        showScreen(new Placeholder("Vibe result"));
+        showScreen(new VibeResultPanel(this, user, result));
     }
 
     public void enterApp(User user) {
