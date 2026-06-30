@@ -180,9 +180,9 @@ public class MainWindow extends JPanel {
         setContent(new CommunityDetailPanel(this, user, c));
     }
 
-    // open one post with its comments (detail screen comes next)
+    // open one post with its comments
     public void openPost(model.Post post, Community community) {
-        setContent(new Placeholder("Post: " + post.getTitle()));
+        setContent(new PostDetailPanel(this, user, post, community));
     }
 
     /*
