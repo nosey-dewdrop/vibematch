@@ -166,7 +166,7 @@ public class MainWindow extends JPanel {
 
     public void showMessages() {
         setActive("messages");
-        setContent(new Placeholder("Messages"));
+        setContent(new MessagesPanel(this, user));
     }
 
     public void showProfile() {
