@@ -4,6 +4,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import data.Db;
+import data.SampleData;
 import screens.AppFrame;
 
 /*
@@ -15,6 +16,8 @@ public class Main {
     public static void main(String[] args) {
         // open db / create tables up front so the first screen is ready
         Db.connect();
+        // first run only: drop in some sample communities and people
+        SampleData.seedIfNeeded();
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
