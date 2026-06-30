@@ -180,7 +180,7 @@ public class MainWindow extends JPanel {
 
     public void showSettings() {
         setActive("profile");
-        setContent(new Placeholder("Settings"));
+        setContent(new SettingsPanel(this, user));
     }
 
     // open a single community page
