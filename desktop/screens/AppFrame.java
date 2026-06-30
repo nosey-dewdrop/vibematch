@@ -71,7 +71,6 @@ public class AppFrame extends JFrame {
     }
 
     public void enterApp(User user) {
-        // the main app with the sidebar comes later
-        showScreen(new Placeholder("Home"));
+        showScreen(new MainWindow(this, user));
     }
 }
