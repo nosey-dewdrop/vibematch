@@ -1,0 +1,21 @@
+# compiled output
+build/
+*.class
+
+# local secrets (smtp / db). never commit this
+desktop/credentials.properties
+
+# runtime sqlite database
+*.db
+
+# mac stuff
+.DS_Store
+
+# editor / tooling
+.idea/
+.vscode/
+.claude/
+CLAUDE.md
+
+# ios build artifacts (phase 2)
+ios/build/
