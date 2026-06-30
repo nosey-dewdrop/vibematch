@@ -156,7 +156,7 @@ public class MainWindow extends JPanel {
 
     public void showDiscover() {
         setActive("discover");
-        setContent(new Placeholder("Discover"));
+        setContent(new DiscoverPanel(this, user));
     }
 
     public void showMyCommunities() {
