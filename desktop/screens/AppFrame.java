@@ -59,8 +59,12 @@ public class AppFrame extends JFrame {
     }
 
     public void startOnboarding(User user) {
-        // interest picker + mbti test come later
-        showScreen(new Placeholder("Onboarding"));
+        showScreen(new InterestPanel(this, user));
+    }
+
+    public void startMbti(User user) {
+        // the 16 question test comes next
+        showScreen(new Placeholder("Vibe test"));
     }
 
     public void enterApp(User user) {
