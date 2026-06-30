@@ -63,8 +63,12 @@ public class AppFrame extends JFrame {
     }
 
     public void startMbti(User user) {
-        // the 16 question test comes next
-        showScreen(new Placeholder("Vibe test"));
+        showScreen(new MbtiTestPanel(this, user));
+    }
+
+    public void showVibeResult(User user, model.MbtiResult result) {
+        // result screen comes next
+        showScreen(new Placeholder("Vibe result"));
     }
 
     public void enterApp(User user) {
