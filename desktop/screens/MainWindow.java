@@ -174,9 +174,15 @@ public class MainWindow extends JPanel {
         setContent(new Placeholder("Profile"));
     }
 
-    // open a single community page (detail screen comes later)
+    // open a single community page
     public void openCommunity(Community c) {
-        setContent(new Placeholder("Community: " + c.getName()));
+        setActive("discover");
+        setContent(new CommunityDetailPanel(this, user, c));
+    }
+
+    // open one post with its comments (detail screen comes next)
+    public void openPost(model.Post post, Community community) {
+        setContent(new Placeholder("Post: " + post.getTitle()));
     }
 
     /*
