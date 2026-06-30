@@ -42,13 +42,11 @@ public class AppFrame extends JFrame {
     }
 
     public void showRegister() {
-        // built in the next step
-        showScreen(new Placeholder("Register"));
+        showScreen(new RegisterScreen(this));
     }
 
     public void showVerify(User user, String code) {
-        // built in the next step
-        showScreen(new Placeholder("Verify email"));
+        showScreen(new VerifyScreen(this, user, code));
     }
 
     // after a successful login or verify, decide where to send them
