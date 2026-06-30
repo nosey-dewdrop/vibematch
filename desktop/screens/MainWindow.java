@@ -161,7 +161,7 @@ public class MainWindow extends JPanel {
 
     public void showMyCommunities() {
         setActive("communities");
-        setContent(new Placeholder("My Communities"));
+        setContent(new MyCommunitiesPanel(this, user));
     }
 
     public void showMessages() {
