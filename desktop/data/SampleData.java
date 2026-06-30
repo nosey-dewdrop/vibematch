@@ -1,6 +1,8 @@
 package data;
 
+import model.Comment;
 import model.Community;
+import model.Post;
 import model.User;
 import util.PasswordUtil;
 
@@ -17,6 +19,7 @@ public class SampleData {
 
     private static UserDao userDao = new UserDao();
     private static CommunityDao communityDao = new CommunityDao();
+    private static PostDao postDao = new PostDao();
 
     public static void seedIfNeeded() {
         if (!communityDao.isEmpty()) {
@@ -24,6 +27,7 @@ public class SampleData {
         }
         seedUsers();
         seedCommunities();
+        seedForum();
     }
 
     private static void seedUsers() {
@@ -102,6 +106,47 @@ public class SampleData {
         communityDao.join("elif", debate);
         communityDao.join("mert", debate);
         communityDao.join("ada", coffee);
+    }
+
+    // a few starter discussions so the forums arent empty
+    private static void seedForum() {
+        int outdoor = findCommunityId("Bilkent Outdoor Society");
+        int frame = findCommunityId("Frame Photo Club");
+        int pages = findCommunityId("Page Turners");
+
+        if (outdoor > 0) {
+            int p1 = postDao.insertPost(new Post(outdoor, "ada",
+                "Weekend hike to Elmadag, who's in?",
+                "Thinking of leaving from the main gate around 8am Saturday. Beginner friendly pace, we'll be back by evening. Comment if you want to come!"));
+            postDao.insertComment(new Comment(p1, "can", "I'm in! Should I bring trekking poles?", 0));
+            postDao.insertComment(new Comment(p1, "ada", "Not needed but they help on the way down :)", 1));
+            postDao.insertComment(new Comment(p1, "elif", "Count me in too, so excited", 0));
+        }
+
+        if (frame > 0) {
+            int p2 = postDao.insertPost(new Post(frame, "can",
+                "Golden hour photo walk by the lake",
+                "The light has been unreal lately. Lets meet Friday 6.30pm near the lake and shoot until sunset."));
+            postDao.insertComment(new Comment(p2, "ada", "Yes please, I just got a new lens i want to try", 0));
+        }
+
+        if (pages > 0) {
+            int p3 = postDao.insertPost(new Post(pages, "zeynep",
+                "This month's book: pick between two",
+                "It's between a short story collection and a novel. Drop your vote in the comments."));
+            postDao.insertComment(new Comment(p3, "ada", "Short stories! easier to keep up with classes", 0));
+            postDao.insertComment(new Comment(p3, "zeynep", "Noted, leaning that way too", 1));
+        }
+    }
+
+    private static int findCommunityId(String name) {
+        ArrayList<Community> all = communityDao.getAll();
+        for (int i = 0; i < all.size(); i++) {
+            if (all.get(i).getName().equals(name)) {
+                return all.get(i).getId();
+            }
+        }
+        return -1;
     }
 
     private static int makeCommunity(String name, String desc, String category, String emoji,
