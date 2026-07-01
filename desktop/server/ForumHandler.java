@@ -39,9 +39,9 @@ public class ForumHandler {
         return Response.reply(req.id, Json.toJson(array));
     }
 
-    public Response createPost(Request req) {
+    public Response createPost(Request req, ClientHandler client) {
         int communityId = req.getInt("communityId");
-        Post p = new Post(communityId, req.getString("author"),
+        Post p = new Post(communityId, client.getUsername(),
                 req.getString("title"), req.getString("body"));
         int newId = postDao.insertPost(p);
         p.setId(newId);
@@ -61,9 +61,10 @@ public class ForumHandler {
         return Response.reply(req.id, Json.toJson(array));
     }
 
-    public Response addComment(Request req) {
+    public Response addComment(Request req, ClientHandler client) {
         int postId = req.getInt("postId");
-        Comment c = new Comment(postId, req.getString("author"),
+        String author = client.getUsername();
+        Comment c = new Comment(postId, author,
                 req.getString("body"), req.getInt("parentId"));
         int newId = postDao.insertComment(c);
         c.setId(newId);
@@ -73,7 +74,6 @@ public class ForumHandler {
         if (post != null) {
             pushForumUpdate(post.getCommunityId());
             // tell the post's author someone replied (unless they did it themself)
-            String author = req.getString("author");
             if (post.getAuthor() != null && !post.getAuthor().equals(author)) {
                 Notifier.notify(server, post.getAuthor(),
                         "reply", author + " commented on your post \"" + post.getTitle() + "\"");

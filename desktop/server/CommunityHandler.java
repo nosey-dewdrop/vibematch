@@ -24,8 +24,8 @@ public class CommunityHandler {
     private MatchService matcher = new MatchService();
     private UserDao userDao = new UserDao();
 
-    public Response list(Request req) {
-        return scoredListResponse(req, communities.getAll());
+    public Response list(Request req, ClientHandler client) {
+        return scoredListResponse(client, req, communities.getAll());
     }
 
     public Response get(Request req) {
@@ -36,37 +36,37 @@ public class CommunityHandler {
         return Response.reply(req.id, Json.toJson(c));
     }
 
-    public Response byCategory(Request req) {
-        return scoredListResponse(req, communities.getByCategory(req.getString("category")));
+    public Response byCategory(Request req, ClientHandler client) {
+        return scoredListResponse(client, req, communities.getByCategory(req.getString("category")));
     }
 
-    public Response search(Request req) {
-        return scoredListResponse(req, communities.search(req.getString("text")));
+    public Response search(Request req, ClientHandler client) {
+        return scoredListResponse(client, req, communities.search(req.getString("text")));
     }
 
-    public Response joined(Request req) {
-        return listResponse(req.id, communities.getJoined(req.getString("username")));
+    public Response joined(Request req, ClientHandler client) {
+        return listResponse(req.id, communities.getJoined(client.getUsername()));
     }
 
-    public Response isMember(Request req) {
-        boolean member = communities.isMember(req.getString("username"), req.getInt("communityId"));
+    public Response isMember(Request req, ClientHandler client) {
+        boolean member = communities.isMember(client.getUsername(), req.getInt("communityId"));
         return Response.reply(req.id, "{\"member\":" + member + "}");
     }
 
-    public Response join(Request req) {
-        communities.join(req.getString("username"), req.getInt("communityId"));
+    public Response join(Request req, ClientHandler client) {
+        communities.join(client.getUsername(), req.getInt("communityId"));
         return Response.reply(req.id, "{\"ok\":true}");
     }
 
-    public Response leave(Request req) {
-        communities.leave(req.getString("username"), req.getInt("communityId"));
+    public Response leave(Request req, ClientHandler client) {
+        communities.leave(client.getUsername(), req.getInt("communityId"));
         return Response.reply(req.id, "{\"ok\":true}");
     }
 
     // the home feed: score every community this user hasnt joined and return
     // the best ones, with the match percent already filled in
-    public Response homeMatches(Request req) {
-        String username = req.getString("username");
+    public Response homeMatches(Request req, ClientHandler client) {
+        String username = client.getUsername();
         User user = userDao.findByUsername(username);
         if (user == null) {
             return Response.fail(req.id, "user not found");
@@ -83,8 +83,8 @@ public class CommunityHandler {
     }
 
     // score a single community for a user (used on the detail page)
-    public Response scoreOne(Request req) {
-        String username = req.getString("username");
+    public Response scoreOne(Request req, ClientHandler client) {
+        String username = client.getUsername();
         User user = userDao.findByUsername(username);
         Community c = communities.findById(req.getInt("communityId"));
         if (user == null || c == null) {
@@ -98,8 +98,8 @@ public class CommunityHandler {
     // like listResponse but fills in each community's match percent AND whether
     // the user is already a member, so the client doesnt have to ask community
     // by community (that was slow). we load the user's joined ids once here.
-    private Response scoredListResponse(Request req, ArrayList<Community> list) {
-        String username = req.getString("username");
+    private Response scoredListResponse(ClientHandler client, Request req, ArrayList<Community> list) {
+        String username = client.getUsername();
         if (username != null) {
             User user = userDao.findByUsername(username);
             if (user != null) {

@@ -27,8 +27,8 @@ public class MessageHandler {
         this.server = server;
     }
 
-    public Response partners(Request req) {
-        ArrayList<String> partners = messageDao.getPartners(req.getString("username"));
+    public Response partners(Request req, ClientHandler client) {
+        ArrayList<String> partners = messageDao.getPartners(client.getUsername());
         String[] array = new String[partners.size()];
         for (int i = 0; i < partners.size(); i++) {
             array[i] = partners.get(i);
@@ -36,8 +36,8 @@ public class MessageHandler {
         return Response.reply(req.id, Json.toJson(array));
     }
 
-    public Response conversation(Request req) {
-        ArrayList<Message> list = messageDao.getConversation(req.getString("me"), req.getString("other"));
+    public Response conversation(Request req, ClientHandler client) {
+        ArrayList<Message> list = messageDao.getConversation(client.getUsername(), req.getString("other"));
         Message[] array = new Message[list.size()];
         for (int i = 0; i < list.size(); i++) {
             array[i] = list.get(i);
@@ -45,8 +45,8 @@ public class MessageHandler {
         return Response.reply(req.id, Json.toJson(array));
     }
 
-    public Response send(Request req) {
-        String sender = req.getString("sender");
+    public Response send(Request req, ClientHandler client) {
+        String sender = client.getUsername();
         String receiver = req.getString("receiver");
         String body = req.getString("body");
 

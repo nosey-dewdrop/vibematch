@@ -45,7 +45,7 @@ public class RequestRouter {
             return Response.reply(request.id, Json.toJson(data));
         }
 
-        // auth
+        // auth: the only actions allowed before this connection has logged in
         if (action.equals("register")) {
             return authHandler.register(request);
         }
@@ -59,12 +59,19 @@ public class RequestRouter {
             return authHandler.login(request, client, server);
         }
 
+        // everything past this point acts on behalf of a user, so this
+        // connection must have logged in first. we never trust a username from
+        // the request body, only who this socket actually is.
+        if (client.getUsername() == null) {
+            return Response.fail(request.id, "Please log in first.");
+        }
+
         // profile / onboarding
         if (action.equals("setInterests")) {
-            return profileHandler.setInterests(request);
+            return profileHandler.setInterests(request, client);
         }
         if (action.equals("submitMbti")) {
-            return profileHandler.submitMbti(request);
+            return profileHandler.submitMbti(request, client);
         }
         if (action.equals("getUser")) {
             return profileHandler.getUser(request);
@@ -72,34 +79,34 @@ public class RequestRouter {
 
         // communities
         if (action.equals("communities.list")) {
-            return communityHandler.list(request);
+            return communityHandler.list(request, client);
         }
         if (action.equals("communities.get")) {
             return communityHandler.get(request);
         }
         if (action.equals("communities.byCategory")) {
-            return communityHandler.byCategory(request);
+            return communityHandler.byCategory(request, client);
         }
         if (action.equals("communities.search")) {
-            return communityHandler.search(request);
+            return communityHandler.search(request, client);
         }
         if (action.equals("communities.joined")) {
-            return communityHandler.joined(request);
+            return communityHandler.joined(request, client);
         }
         if (action.equals("communities.isMember")) {
-            return communityHandler.isMember(request);
+            return communityHandler.isMember(request, client);
         }
         if (action.equals("communities.join")) {
-            return communityHandler.join(request);
+            return communityHandler.join(request, client);
         }
         if (action.equals("communities.leave")) {
-            return communityHandler.leave(request);
+            return communityHandler.leave(request, client);
         }
         if (action.equals("communities.homeMatches")) {
-            return communityHandler.homeMatches(request);
+            return communityHandler.homeMatches(request, client);
         }
         if (action.equals("communities.scoreOne")) {
-            return communityHandler.scoreOne(request);
+            return communityHandler.scoreOne(request, client);
         }
 
         // forum
@@ -107,52 +114,52 @@ public class RequestRouter {
             return forumHandler.posts(request);
         }
         if (action.equals("forum.createPost")) {
-            return forumHandler.createPost(request);
+            return forumHandler.createPost(request, client);
         }
         if (action.equals("forum.comments")) {
             return forumHandler.comments(request);
         }
         if (action.equals("forum.addComment")) {
-            return forumHandler.addComment(request);
+            return forumHandler.addComment(request, client);
         }
 
         // friends
         if (action.equals("friends.request")) {
-            return friendHandler.sendRequest(request);
+            return friendHandler.sendRequest(request, client);
         }
         if (action.equals("friends.respond")) {
-            return friendHandler.respond(request);
+            return friendHandler.respond(request, client);
         }
         if (action.equals("friends.list")) {
-            return friendHandler.friends(request);
+            return friendHandler.friends(request, client);
         }
         if (action.equals("friends.requests")) {
-            return friendHandler.requests(request);
+            return friendHandler.requests(request, client);
         }
         if (action.equals("friends.status")) {
-            return friendHandler.status(request);
+            return friendHandler.status(request, client);
         }
 
         // notifications
         if (action.equals("notifications.list")) {
-            return notificationHandler.list(request);
+            return notificationHandler.list(request, client);
         }
         if (action.equals("notifications.unread")) {
-            return notificationHandler.unread(request);
+            return notificationHandler.unread(request, client);
         }
         if (action.equals("notifications.markRead")) {
-            return notificationHandler.markRead(request);
+            return notificationHandler.markRead(request, client);
         }
 
         // messages
         if (action.equals("messages.partners")) {
-            return messageHandler.partners(request);
+            return messageHandler.partners(request, client);
         }
         if (action.equals("messages.conversation")) {
-            return messageHandler.conversation(request);
+            return messageHandler.conversation(request, client);
         }
         if (action.equals("messages.send")) {
-            return messageHandler.send(request);
+            return messageHandler.send(request, client);
         }
         if (action.equals("messages.findUser")) {
             return messageHandler.findUser(request);

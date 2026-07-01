@@ -28,8 +28,8 @@ public class FriendHandler {
         this.server = server;
     }
 
-    public Response sendRequest(Request req) {
-        String from = req.getString("from");
+    public Response sendRequest(Request req, ClientHandler client) {
+        String from = client.getUsername();
         String to = req.getString("to");
 
         if (to == null || to.trim().isEmpty()) {
@@ -63,8 +63,8 @@ public class FriendHandler {
         return Response.reply(req.id, "{\"sent\":true}");
     }
 
-    public Response respond(Request req) {
-        String me = req.getString("me");
+    public Response respond(Request req, ClientHandler client) {
+        String me = client.getUsername();
         String requester = req.getString("requester");
         boolean accept = req.getInt("accept") == 1;
 
@@ -78,16 +78,16 @@ public class FriendHandler {
         return Response.reply(req.id, "{\"ok\":true}");
     }
 
-    public Response friends(Request req) {
-        return names(req.id, friendDao.getFriends(req.getString("username")));
+    public Response friends(Request req, ClientHandler client) {
+        return names(req.id, friendDao.getFriends(client.getUsername()));
     }
 
-    public Response requests(Request req) {
-        return names(req.id, friendDao.getIncomingRequests(req.getString("username")));
+    public Response requests(Request req, ClientHandler client) {
+        return names(req.id, friendDao.getIncomingRequests(client.getUsername()));
     }
 
-    public Response status(Request req) {
-        String relation = friendDao.relationFor(req.getString("me"), req.getString("other"));
+    public Response status(Request req, ClientHandler client) {
+        String relation = friendDao.relationFor(client.getUsername(), req.getString("other"));
         return Response.reply(req.id, "{\"relation\":\"" + relation + "\"}");
     }
 

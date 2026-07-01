@@ -16,8 +16,8 @@ public class NotificationHandler {
 
     private NotificationDao dao = new NotificationDao();
 
-    public Response list(Request req) {
-        ArrayList<Notification> list = dao.forUser(req.getString("username"));
+    public Response list(Request req, ClientHandler client) {
+        ArrayList<Notification> list = dao.forUser(client.getUsername());
         Notification[] array = new Notification[list.size()];
         for (int i = 0; i < list.size(); i++) {
             array[i] = list.get(i);
@@ -25,13 +25,13 @@ public class NotificationHandler {
         return Response.reply(req.id, Json.toJson(array));
     }
 
-    public Response unread(Request req) {
-        int count = dao.unreadCount(req.getString("username"));
+    public Response unread(Request req, ClientHandler client) {
+        int count = dao.unreadCount(client.getUsername());
         return Response.reply(req.id, "{\"count\":" + count + "}");
     }
 
-    public Response markRead(Request req) {
-        dao.markAllRead(req.getString("username"));
+    public Response markRead(Request req, ClientHandler client) {
+        dao.markAllRead(client.getUsername());
         return Response.reply(req.id, "{\"ok\":true}");
     }
 }

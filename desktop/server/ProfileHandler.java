@@ -23,8 +23,8 @@ public class ProfileHandler {
     private MbtiService mbti = new MbtiService();
 
     // save the picked interests (replaces whatever they had)
-    public Response setInterests(Request req) {
-        String username = req.getString("username");
+    public Response setInterests(Request req, ClientHandler client) {
+        String username = client.getUsername();
         ArrayList<String> picked = new ArrayList<String>();
         if (req.data != null && req.data.has("interests")) {
             JsonArray arr = req.data.getAsJsonArray("interests");
@@ -37,8 +37,8 @@ public class ProfileHandler {
     }
 
     // score the 16 answers, store the type, return the full result for the bars
-    public Response submitMbti(Request req) {
-        String username = req.getString("username");
+    public Response submitMbti(Request req, ClientHandler client) {
+        String username = client.getUsername();
         int[] answers = new int[16];
         if (req.data != null && req.data.has("answers")) {
             JsonArray arr = req.data.getAsJsonArray("answers");
