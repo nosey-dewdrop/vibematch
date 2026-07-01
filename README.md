@@ -5,7 +5,10 @@ things you are into, take a short personality test, and the app matches you with
 communities (clubs, societies, study circles) that fit your vibe. Each community has
 its own little forum where people post and reply, and you can also DM people 1 on 1.
 
-This is a desktop app written in **classic Java Swing**. Phase 2 will add an iOS app.
+It is a real client/server app: a **Java socket server** holds the shared data
+and pushes live updates, and a **classic Java Swing** desktop client connects to
+it. Messages and forum comments arrive in real time. Phase 2 will add an iOS app
+that connects to the same server. See `RAPOR.md` for how the sockets work.
 
 ## Why
 Finding your people in a big campus is hard. Most club stuff is scattered across
@@ -28,14 +31,25 @@ recommends communities to you instead of making you dig.
 - JavaMail for sending the verification code
 
 ## Running it
-You need Java 21 installed. Then from the project root:
+You need Java 21 installed. You start the **server** once, then run one or more
+**clients**.
 
+Terminal 1 — start the server (holds the shared database):
+```bash
+./run-server.sh
+```
+
+Terminal 2 — start the desktop app:
 ```bash
 ./run.sh
 ```
 
-That compiles everything into `build/` and launches the app. A `vibematch.db`
-file gets created on first run with some sample communities and users.
+The `vibematch.db` file is created next to the server on first run, seeded with
+sample communities and users. To connect from another computer on the same
+network, pass the server's address: `./run.sh 192.168.1.20`.
+
+Open two clients (log in as different demo users) to see messages and forum
+comments show up in real time.
 
 > Email sending is optional. If you don't set up SMTP credentials the verification
 > code is just shown in a popup so the app still works for testing. To send real

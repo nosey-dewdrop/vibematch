@@ -1,8 +1,10 @@
 # vibematch
 
 ## Status
-Current phase: Core done, heading into Polish
-Last session: 2026-06-30 — whole Phase 1 desktop app built end to end and tested.
+Current phase: Real time client/server done, heading into cloud deploy
+Last session: 2026-07-01 — turned the app into a socket based client/server: a
+Java server holds the shared database and pushes live updates, the desktop app is
+now a client. Real time DMs + forum working and tested. See RAPOR.md.
 
 ## Roadmap
 
@@ -41,9 +43,16 @@ Last session: 2026-06-30 — whole Phase 1 desktop app built end to end and test
 - [x] settings + logout
 - [ ] polish pass, empty states, edge cases (run it and click through)
 
-### Phase 7: iOS (later)
-- [ ] expose data layer through a small local backend
-- [ ] swiftui client
+### Phase 7: Real time client/server
+- [x] socket server (java.net.ServerSocket, thread per client)
+- [x] json request/reply protocol + client ServerClient
+- [x] move all data behind the server, desktop becomes a client
+- [x] live push for direct messages
+- [x] live push for forum posts/comments
+- [ ] deploy the server to a free cloud machine (Oracle) so it runs 24/7
+
+### Phase 8: iOS (later)
+- [ ] swiftui client that connects to the same server over sockets
 
 ## How to run
 `./run.sh` from the project root. First run seeds sample communities + people.
