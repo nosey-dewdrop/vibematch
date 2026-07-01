@@ -27,8 +27,26 @@ public class AuthHandler {
     private AuthService auth = new AuthService();
     private UserDao userDao = new UserDao();
 
-    // codes we are waiting to be confirmed
-    private HashMap<String, String> pendingCodes = new HashMap<String, String>();
+    // a code only stays valid for a short while, and only a handful of wrong
+    // tries, so nobody can sit there guessing the 6 digits
+    private static final long CODE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+    private static final int MAX_ATTEMPTS = 5;
+
+    // codes we are waiting to be confirmed, keyed by username
+    private HashMap<String, PendingCode> pendingCodes = new HashMap<String, PendingCode>();
+
+    // a code together with when it dies and how many wrong tries it has left
+    private static class PendingCode {
+        String code;
+        long expiresAt;
+        int attemptsLeft;
+
+        PendingCode(String code, long expiresAt, int attemptsLeft) {
+            this.code = code;
+            this.expiresAt = expiresAt;
+            this.attemptsLeft = attemptsLeft;
+        }
+    }
 
     public Response register(Request req) {
         String name = req.getString("displayName");
@@ -41,7 +59,7 @@ public class AuthHandler {
         User user = auth.register(name, username, email, password);
 
         String code = auth.generateVerificationCode();
-        pendingCodes.put(user.getUsername(), code);
+        storeCode(user.getUsername(), code);
 
         boolean emailed = EmailSender.sendVerificationCode(user.getEmail(), code);
 
@@ -60,8 +78,20 @@ public class AuthHandler {
         String username = req.getString("username");
         String typed = req.getString("code");
 
-        String expected = pendingCodes.get(username);
-        if (expected == null || typed == null || !typed.trim().equals(expected)) {
+        PendingCode pending = pendingCodes.get(username);
+        if (pending == null) {
+            return Response.fail(req.id, "No code to check. Ask for a new one.");
+        }
+        if (System.currentTimeMillis() > pending.expiresAt) {
+            pendingCodes.remove(username);
+            return Response.fail(req.id, "That code expired. Ask for a new one.");
+        }
+        if (typed == null || !typed.trim().equals(pending.code)) {
+            pending.attemptsLeft--;
+            if (pending.attemptsLeft <= 0) {
+                pendingCodes.remove(username);
+                return Response.fail(req.id, "Too many wrong tries. Ask for a new code.");
+            }
             return Response.fail(req.id, "That code isn't right, check again.");
         }
         auth.markVerified(username);
@@ -79,7 +109,7 @@ public class AuthHandler {
         String username = req.getString("username");
         String email = req.getString("email");
         String code = auth.generateVerificationCode();
-        pendingCodes.put(username, code);
+        storeCode(username, code);
         boolean emailed = EmailSender.sendVerificationCode(email, code);
 
         JsonObject data = new JsonObject();
@@ -102,5 +132,11 @@ public class AuthHandler {
         server.register(user.getUsername(), client);
 
         return Response.reply(req.id, Json.toJson(Dto.safeUser(user)));
+    }
+
+    // save a fresh code with its expiry and a full set of attempts
+    private void storeCode(String username, String code) {
+        long expiresAt = System.currentTimeMillis() + CODE_TTL_MS;
+        pendingCodes.put(username, new PendingCode(code, expiresAt, MAX_ATTEMPTS));
     }
 }
