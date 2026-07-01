@@ -13,7 +13,9 @@ PORT=5050
 
 echo "==> installing java"
 apt-get update -y
-apt-get install -y openjdk-17-jdk-headless
+# default-jdk grabs whatever recent OpenJDK the distro ships (works on both
+# Debian and Ubuntu); we only need javac + java, any version 17+ is fine
+apt-get install -y default-jdk
 
 echo "==> creating the service user"
 id vibematch >/dev/null 2>&1 || useradd --system --home "$APP_DIR" --shell /usr/sbin/nologin vibematch
