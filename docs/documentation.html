@@ -5,57 +5,57 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>vibematch — Technical Documentation</title>
 <style>
-  :root{ --ink:#1b1b1f; --soft:#555; --rule:#d8d8de; --accent:#2c2740; }
+  :root{
+    --lilac-50:#f6f2fd;--lilac-100:#efe8fb;--lilac-200:#e2d5f6;--lilac-300:#cfb9ee;
+    --lilac-400:#b8a4e3;--lilac-500:#9c82d6;--lilac-600:#8b6fc7;--lilac-700:#6f55a8;
+    --ink:#3a3050;--ink-soft:#6b6280;--rule:#e2d5f6;--mint:#d6f0e4;
+  }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{
-    font-family:Georgia,'Times New Roman',serif;
-    color:var(--ink); background:#e9e9ec; margin:0; line-height:1.62;
+    font-family:'Times New Roman', Times, serif; color:var(--ink); margin:0; line-height:1.62;
+    background:radial-gradient(120% 60% at 0% 0%, #efe8fb 0%, transparent 55%),
+      radial-gradient(120% 60% at 100% 3%, #ffe7f0 0%, transparent 50%),#f6f2fd;
     -webkit-font-smoothing:antialiased;
   }
-  .page{
-    max-width:760px; margin:32px auto; background:#fff; padding:64px 72px;
-    box-shadow:0 1px 4px rgba(0,0,0,.14); border:1px solid #ddd;
-  }
-  /* cover block */
-  .cover{border-bottom:2px solid var(--ink); padding-bottom:20px; margin-bottom:12px}
-  .cover .kind{font-family:Arial,Helvetica,sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--soft)}
-  .cover h1{font-size:34px;margin:8px 0 4px;font-weight:normal;letter-spacing:-.3px}
-  .cover .meta{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:var(--soft);margin-top:8px}
-  .cover .meta a{color:var(--accent)}
+  .page{ max-width:800px; margin:34px auto; background:#fff; padding:60px 66px;
+    border-radius:22px; box-shadow:0 24px 60px -30px rgba(108,80,168,.55); border:1px solid var(--lilac-100); }
+  .cover{border-bottom:2px solid var(--lilac-300); padding-bottom:20px; margin-bottom:12px}
+  .cover .kind{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--lilac-500);font-weight:bold}
+  .cover h1{font-size:40px;margin:8px 0 4px;font-weight:600;letter-spacing:-.5px;font-style:italic;color:var(--lilac-700)}
+  .cover .meta{font-size:14px;color:var(--ink-soft);margin-top:8px}
+  .cover .meta a{color:var(--lilac-600)}
 
-  h2{font-size:21px;font-weight:normal;margin:34px 0 6px;border-bottom:1px solid var(--rule);padding-bottom:5px}
-  h2 .num{color:var(--soft);font-family:Arial,Helvetica,sans-serif;font-size:15px;margin-right:8px}
-  h3{font-size:16px;margin:20px 0 4px;font-weight:bold}
-  p{margin:9px 0;text-align:justify}
+  h2{font-size:24px;font-weight:600;margin:36px 0 6px;border-bottom:1px solid var(--rule);padding-bottom:6px;color:var(--ink)}
+  h2 .num{color:#fff;background:var(--lilac-500);border-radius:8px;padding:1px 9px;font-size:16px;margin-right:10px}
+  h3{font-size:18px;margin:22px 0 4px;font-weight:bold;color:var(--lilac-700)}
+  p{margin:9px 0}
   ul,ol{margin:9px 0 9px 22px}
-  li{margin:4px 0}
-  strong{font-weight:bold}
-  em{font-style:italic}
-  a{color:var(--accent)}
+  li{margin:5px 0}
+  strong{color:var(--lilac-700)}
+  a{color:var(--lilac-600)}
 
-  /* table of contents */
-  .toc{font-family:Arial,Helvetica,sans-serif;font-size:13.5px;background:#f6f6f8;border:1px solid var(--rule);padding:14px 18px;margin:18px 0}
-  .toc b{display:block;margin-bottom:6px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--soft)}
+  .toc{font-size:15px;background:var(--lilac-50);border:1px solid var(--rule);border-radius:14px;padding:16px 20px;margin:18px 0}
+  .toc b{display:block;margin-bottom:6px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--lilac-500)}
   .toc a{display:block;color:var(--ink);text-decoration:none;padding:2px 0}
-  .toc a:hover{text-decoration:underline}
+  .toc a:hover{color:var(--lilac-700);text-decoration:underline}
 
-  code{font-family:'Courier New',monospace;font-size:.92em;background:#f2f2f4;padding:1px 4px;border:1px solid #e2e2e6}
-  pre{font-family:'Courier New',monospace;font-size:12.5px;line-height:1.55;background:#f7f7f9;border:1px solid var(--rule);
-      padding:14px 16px;overflow-x:auto;margin:12px 0;white-space:pre}
-  .fig{font-family:Arial,Helvetica,sans-serif;font-size:12px;color:var(--soft);margin:4px 0 16px;text-align:center}
+  code{font-family:'Times New Roman', Times, serif;font-style:italic;background:var(--lilac-50);padding:1px 6px;border-radius:5px;color:var(--lilac-700);border:1px solid var(--lilac-100)}
+  pre{font-family:'Courier New',monospace;font-size:12.5px;line-height:1.55;background:#2a2440;color:#e7dffb;
+      border-radius:12px;padding:16px 18px;overflow-x:auto;margin:12px 0;white-space:pre}
+  .fig{font-size:13px;color:var(--ink-soft);font-style:italic;margin:4px 0 16px;text-align:center}
 
-  /* UML class reference blocks */
-  .uml{font-family:'Courier New',monospace;font-size:12.5px;line-height:1.5;border:1px solid var(--rule);margin:10px 0}
-  .uml .cn{background:#f0f0f3;border-bottom:1px solid var(--rule);padding:5px 12px;font-weight:bold}
-  .uml .cn small{font-weight:normal;color:var(--soft)}
-  .uml .sec{padding:6px 12px}
+  .uml{border:1px solid var(--rule);border-radius:12px;margin:10px 0;overflow:hidden;font-family:'Times New Roman', Times, serif}
+  .uml .cn{background:var(--lilac-100);border-bottom:1px solid var(--rule);padding:6px 13px;font-weight:bold;color:var(--lilac-700)}
+  .uml .cn small{font-weight:normal;color:var(--ink-soft)}
+  .uml .sec{padding:6px 13px;font-size:13.5px;color:var(--ink-soft)}
   .uml .sec + .sec{border-top:1px dashed var(--rule)}
-  .uml .k{color:#444}
+  .uml .k{color:var(--lilac-400);font-style:italic}
 
-  .qa{border-left:3px solid var(--accent);padding:4px 0 4px 16px;margin:12px 0}
-  .qa .q{font-weight:bold}
-  .note{font-family:Arial,Helvetica,sans-serif;font-size:12.5px;color:var(--soft);border-top:1px solid var(--rule);margin-top:40px;padding-top:12px}
+  .qa{background:linear-gradient(135deg,#fff,var(--mint) 260%);border-left:4px solid #5cc09a;border-radius:12px;padding:14px 18px;margin:14px 0}
+  .qa .q{font-weight:bold;color:#2f8a63}
+  .note{font-size:13px;color:var(--ink-soft);border-top:1px solid var(--rule);margin-top:40px;padding-top:14px}
+  .note a{color:var(--lilac-600)}
   @media print{ body{background:#fff} .page{box-shadow:none;border:none;margin:0;max-width:none} }
 </style>
 </head>
