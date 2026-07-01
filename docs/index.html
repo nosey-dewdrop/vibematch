@@ -3,338 +3,339 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>How we built vibematch</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Quicksand:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>vibematch — Technical Documentation</title>
 <style>
-:root{
-  --lilac-50:#f6f2fd;--lilac-100:#efe8fb;--lilac-200:#e2d5f6;--lilac-300:#cfb9ee;
-  --lilac-400:#b8a4e3;--lilac-500:#9c82d6;--lilac-600:#8b6fc7;--lilac-700:#6f55a8;
-  --ink:#3a3050;--ink-soft:#6b6280;--white:#fff;
-  --blush:#ffd6e0;--peach:#ffe2cf;--mint:#d6f0e4;--butter:#fdf2c9;--sky:#d7e8fb;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:'Quicksand',sans-serif;color:var(--ink);line-height:1.6;
-  background:radial-gradient(120% 60% at 0% 0%, #efe8fb 0%, transparent 55%),
-    radial-gradient(120% 60% at 100% 3%, #ffe7f0 0%, transparent 50%),#f6f2fd;
-  -webkit-font-smoothing:antialiased;}
+  :root{ --ink:#1b1b1f; --soft:#555; --rule:#d8d8de; --accent:#2c2740; }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:Georgia,'Times New Roman',serif;
+    color:var(--ink); background:#e9e9ec; margin:0; line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{
+    max-width:760px; margin:32px auto; background:#fff; padding:64px 72px;
+    box-shadow:0 1px 4px rgba(0,0,0,.14); border:1px solid #ddd;
+  }
+  /* cover block */
+  .cover{border-bottom:2px solid var(--ink); padding-bottom:20px; margin-bottom:12px}
+  .cover .kind{font-family:Arial,Helvetica,sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--soft)}
+  .cover h1{font-size:34px;margin:8px 0 4px;font-weight:normal;letter-spacing:-.3px}
+  .cover .meta{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:var(--soft);margin-top:8px}
+  .cover .meta a{color:var(--accent)}
 
-/* top nav */
-nav{position:sticky;top:0;z-index:50;background:rgba(246,242,253,.82);backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--lilac-200);padding:12px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-nav .brand{display:flex;align-items:center;gap:9px;font-family:'Fraunces';font-weight:600;font-size:18px}
-nav .brand .dot{width:26px;height:26px;border-radius:8px;background:linear-gradient(140deg,var(--lilac-400),var(--lilac-600));
-  color:#fff;display:grid;place-items:center;font-size:15px;transform:rotate(-6deg)}
-nav .links{display:flex;gap:16px;margin-left:auto;flex-wrap:wrap;font-size:13.5px;font-weight:600}
-nav .links a{color:var(--ink-soft);text-decoration:none}
-nav .links a:hover{color:var(--lilac-700)}
+  h2{font-size:21px;font-weight:normal;margin:34px 0 6px;border-bottom:1px solid var(--rule);padding-bottom:5px}
+  h2 .num{color:var(--soft);font-family:Arial,Helvetica,sans-serif;font-size:15px;margin-right:8px}
+  h3{font-size:16px;margin:20px 0 4px;font-weight:bold}
+  p{margin:9px 0;text-align:justify}
+  ul,ol{margin:9px 0 9px 22px}
+  li{margin:4px 0}
+  strong{font-weight:bold}
+  em{font-style:italic}
+  a{color:var(--accent)}
 
-.wrap{max-width:860px;margin:0 auto;padding:0 22px}
+  /* table of contents */
+  .toc{font-family:Arial,Helvetica,sans-serif;font-size:13.5px;background:#f6f6f8;border:1px solid var(--rule);padding:14px 18px;margin:18px 0}
+  .toc b{display:block;margin-bottom:6px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--soft)}
+  .toc a{display:block;color:var(--ink);text-decoration:none;padding:2px 0}
+  .toc a:hover{text-decoration:underline}
 
-/* hero */
-.hero{text-align:center;padding:70px 22px 40px}
-.hero .tag{display:inline-block;background:#fff;padding:7px 16px;border-radius:100px;font-size:13px;font-weight:700;
-  color:var(--lilac-700);box-shadow:0 8px 20px -14px var(--lilac-500);margin-bottom:22px}
-.hero h1{font-family:'Fraunces';font-weight:600;font-size:clamp(38px,6vw,60px);line-height:1.03;letter-spacing:-1.5px}
-.hero h1 em{font-style:italic;color:var(--lilac-600)}
-.hero p{max-width:600px;margin:20px auto 0;font-size:18px;color:var(--ink-soft);font-weight:500}
-.hero .row{margin-top:26px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.hero .row .pill{background:#fff;padding:8px 15px;border-radius:100px;font-size:13px;font-weight:600;box-shadow:0 8px 20px -16px var(--lilac-500)}
+  code{font-family:'Courier New',monospace;font-size:.92em;background:#f2f2f4;padding:1px 4px;border:1px solid #e2e2e6}
+  pre{font-family:'Courier New',monospace;font-size:12.5px;line-height:1.55;background:#f7f7f9;border:1px solid var(--rule);
+      padding:14px 16px;overflow-x:auto;margin:12px 0;white-space:pre}
+  .fig{font-family:Arial,Helvetica,sans-serif;font-size:12px;color:var(--soft);margin:4px 0 16px;text-align:center}
 
-section{padding:44px 0}
-.sec-tag{font-family:'JetBrains Mono';font-size:12px;font-weight:600;color:var(--lilac-500);letter-spacing:1px;text-transform:uppercase}
-h2{font-family:'Fraunces';font-weight:600;font-size:30px;letter-spacing:-.5px;margin:6px 0 14px}
-h3{font-family:'Fraunces';font-weight:600;font-size:20px;margin:24px 0 8px}
-p{margin:10px 0;color:#4a4160}
-p.lead{font-size:17px}
-strong{color:var(--lilac-700)}
-code{font-family:'JetBrains Mono';font-size:.86em;background:#fff;padding:1px 6px;border-radius:5px;color:var(--lilac-700);box-shadow:0 3px 8px -6px var(--lilac-500)}
+  /* UML class reference blocks */
+  .uml{font-family:'Courier New',monospace;font-size:12.5px;line-height:1.5;border:1px solid var(--rule);margin:10px 0}
+  .uml .cn{background:#f0f0f3;border-bottom:1px solid var(--rule);padding:5px 12px;font-weight:bold}
+  .uml .cn small{font-weight:normal;color:var(--soft)}
+  .uml .sec{padding:6px 12px}
+  .uml .sec + .sec{border-top:1px dashed var(--rule)}
+  .uml .k{color:#444}
 
-.card{background:#fff;border-radius:18px;padding:22px 24px;box-shadow:0 16px 38px -26px rgba(108,80,168,.5);margin:16px 0}
-.card.tinted{background:linear-gradient(135deg,#fff, var(--lilac-50))}
-
-/* step list */
-.steps{counter-reset:s;margin:14px 0}
-.step{display:flex;gap:16px;padding:14px 0;border-bottom:1px dashed var(--lilac-200)}
-.step:last-child{border-bottom:none}
-.step .n{counter-increment:s;flex:none;width:38px;height:38px;border-radius:12px;background:var(--lilac-600);color:#fff;
-  font-family:'Fraunces';font-weight:600;display:grid;place-items:center}
-.step .n::before{content:counter(s)}
-.step h4{font-family:'Fraunces';font-weight:600;font-size:16px;margin-bottom:2px}
-.step p{margin:2px 0;font-size:14.5px;color:var(--ink-soft)}
-.step .why{font-size:13px;color:var(--lilac-700);font-weight:600;margin-top:3px}
-
-.flow{font-family:'JetBrains Mono';font-size:13px;background:#2a2440;color:#e7dffb;border-radius:14px;padding:18px 20px;
-  overflow-x:auto;line-height:1.7;margin:14px 0}
-.flow .k{color:#c9a9f5}.flow .g{color:#8ee6b5}.flow .p{color:#ff9fc0}.flow .c{color:#8a83a8}
-
-.pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:16px 0}
-.pillar{background:#fff;border-radius:16px;padding:18px;box-shadow:0 14px 34px -26px var(--lilac-500)}
-.pillar .e{font-size:26px}
-.pillar h4{font-family:'Fraunces';font-weight:600;font-size:16px;margin:8px 0 4px}
-.pillar p{font-size:13.5px;color:var(--ink-soft);margin:0}
-
-.qa{background:linear-gradient(135deg,#fff,var(--mint) 260%);border-left:4px solid #5cc09a;border-radius:12px;padding:16px 18px;margin:14px 0}
-.qa .q{font-weight:700;color:#2f8a63;font-size:14px}
-.qa .a{margin-top:4px;font-size:14.5px;color:#3a4a42}
-
-.cta{text-align:center;margin:10px 0 4px}
-.cta a{display:inline-block;background:linear-gradient(135deg,var(--lilac-500),var(--lilac-600));color:#fff;
-  text-decoration:none;font-weight:700;padding:13px 26px;border-radius:14px;box-shadow:0 14px 26px -12px var(--lilac-600)}
-
-footer{text-align:center;padding:40px 22px 60px;color:var(--ink-soft);font-size:13px;font-weight:500}
-footer a{color:var(--lilac-700);font-weight:600;text-decoration:none}
-.divider{height:1px;background:linear-gradient(90deg,transparent,var(--lilac-300),transparent);margin:0 auto;max-width:860px}
+  .qa{border-left:3px solid var(--accent);padding:4px 0 4px 16px;margin:12px 0}
+  .qa .q{font-weight:bold}
+  .note{font-family:Arial,Helvetica,sans-serif;font-size:12.5px;color:var(--soft);border-top:1px solid var(--rule);margin-top:40px;padding-top:12px}
+  @media print{ body{background:#fff} .page{box-shadow:none;border:none;margin:0;max-width:none} }
 </style>
 </head>
 <body>
+<div class="page">
 
-<nav>
-  <span class="brand"><span class="dot">v</span> vibematch</span>
-  <span class="links">
-    <a href="#what">What</a>
-    <a href="#approach">Approach</a>
-    <a href="#order">Build order</a>
-    <a href="#email">Email verify</a>
-    <a href="#sockets">Sockets</a>
-    <a href="#privacy">Friends</a>
-    <a href="uml.html">UML</a>
-    <a href="https://github.com/nosey-dewdrop/vibematch">GitHub</a>
-  </span>
-</nav>
-
-<div class="hero">
-  <span class="tag">How we built it · a documentation</span>
-  <h1>Building <em>vibematch</em>,<br>brick by brick.</h1>
-  <p>A Bilkent student community app. This page explains <strong>what</strong> we
-     built, in <strong>what order</strong>, and <strong>why</strong> — the design
-     decisions behind every part.</p>
-  <div class="row">
-    <span class="pill">🎓 Bilkent email verified</span>
-    <span class="pill">🔌 Real-time sockets</span>
-    <span class="pill">🧱 Dependency-first design</span>
-    <span class="pill">☕ Java</span>
+  <div class="cover">
+    <div class="kind">Technical Documentation</div>
+    <h1>vibematch</h1>
+    <div class="meta">
+      A Bilkent student community application (Java) &nbsp;·&nbsp; July 2026<br>
+      Source: <a href="https://github.com/nosey-dewdrop/vibematch">github.com/nosey-dewdrop/vibematch</a>
+      &nbsp;·&nbsp; Class diagram: <a href="uml.html">uml.html</a>
+    </div>
   </div>
-</div>
 
-<div class="wrap">
+  <div class="toc">
+    <b>Contents</b>
+    <a href="#s1">1. Overview</a>
+    <a href="#s2">2. Design approach — dependency-first</a>
+    <a href="#s3">3. Build order (what we built, and why in this order)</a>
+    <a href="#s4">4. Architecture and class reference</a>
+    <a href="#s5">5. Email verification</a>
+    <a href="#s6">6. Sockets and real-time communication</a>
+    <a href="#s7">7. Friends and privacy</a>
+    <a href="#s8">8. Notifications</a>
+    <a href="#s9">9. Summary</a>
+  </div>
 
-  <!-- WHAT -->
-  <section id="what">
-    <div class="sec-tag">01 · What it is</div>
-    <h2>A place to find your people</h2>
-    <p class="lead">You sign up with your Bilkent email, verify it with a code,
-      pick your interests, take a short personality test, and vibematch recommends
-      communities (clubs, societies, study circles) that fit you. Each community
-      has a Reddit-style forum, and you can add friends and message them 1-on-1.</p>
-    <div class="pillars">
-      <div class="pillar"><div class="e">✉️</div><h4>Verified sign-up</h4><p>Only @bilkent emails, confirmed by a code.</p></div>
-      <div class="pillar"><div class="e">🧭</div><h4>Vibe matching</h4><p>Interests + a 16-question test → a match score.</p></div>
-      <div class="pillar"><div class="e">💬</div><h4>Forum + DMs</h4><p>Community discussions and friend messaging.</p></div>
-      <div class="pillar"><div class="e">🔔</div><h4>Real-time</h4><p>Messages and notifications arrive instantly.</p></div>
-    </div>
-  </section>
+  <h2 id="s1"><span class="num">1</span>Overview</h2>
+  <p>vibematch is a community application for Bilkent University students. A user
+     signs up with their Bilkent email, verifies it with a code, selects their
+     interests, and takes a short 16-question personality test. The application then
+     recommends communities (clubs, societies, study circles) that match the user's
+     interests and personality. Each community has a forum with threaded discussions,
+     and users can add friends and exchange direct messages.</p>
+  <p>The application is written in Java. It is built as a <strong>client/server
+     system</strong>: a server program holds a single shared database and pushes
+     real-time updates, and a desktop client (Java Swing) connects to it over a
+     network socket. This document explains what was built, in what order, and the
+     reasoning behind each decision.</p>
 
-  <div class="divider"></div>
+  <h2 id="s2"><span class="num">2</span>Design approach — dependency-first</h2>
+  <p>The whole system was built <strong>bottom-up</strong>, following one rule:
+     <em>a component is never built before the components it depends on.</em> This is
+     the same logic as constructing a building — the foundation is poured before the
+     walls are raised, and the plumbing is installed before the painting.</p>
+  <p>The code is organised into layers, and <strong>each layer depends only on the
+     layer below it</strong>. This keeps the system maintainable: a change in one
+     layer does not break the layers above it. From bottom (built first) to top:</p>
+  <pre>Layer 1  model        plain data classes            (the foundation)
+Layer 2  data         database + DAO classes        (all SQL lives here)
+Layer 3  service      business rules
+Layer 4  server       socket server + handlers      (network / concurrency)
+Layer 5  net          client-side connection (Api)
+Layer 6  ui / screens what the user sees</pre>
+  <p class="fig">Figure 1. Layered architecture. A request travels up from the
+     screen; data returns back down. See <a href="uml.html">uml.html</a> for the full
+     class diagram.</p>
+  <p>The project history on GitHub is roughly forty small commits, each adding a
+     single component in this order. The commit history is itself evidence that the
+     system was built incrementally rather than all at once.</p>
 
-  <!-- APPROACH -->
-  <section id="approach">
-    <div class="sec-tag">02 · Our approach</div>
-    <h2>We built it dependency-first</h2>
-    <p class="lead">The single rule that shaped everything: <strong>you cannot
-      build a thing before the thing it needs.</strong> Like a building — you pour
-      the foundation before you raise the walls, plumb before you paint.</p>
-    <p>So we always worked <strong>bottom to top</strong>: first the data, then how
-      it's stored, then the rules, then the screens, and only at the very end the
-      networking and the nice-to-haves. Every layer only knows the one beneath it,
-      so changing one part never breaks the others.</p>
-    <div class="card tinted">
-      <h3 style="margin-top:0">The layers (bottom = built first)</h3>
-      <div class="flow"><span class="c">// istek yukarı çıkar, veri geri döner</span>
-<span class="k">6</span> ui / screens      <span class="c">— what the user sees</span>
-<span class="k">5</span> net (Api, client) <span class="c">— talks to the server</span>
-<span class="k">4</span> server (sockets)  <span class="c">— network + concurrency</span>
-<span class="k">3</span> service           <span class="c">— the business rules</span>
-<span class="k">2</span> data (DAO + Db)   <span class="c">— where SQL lives</span>
-<span class="k">1</span> model             <span class="g">— the foundation, just data</span></div>
-      <p style="margin-bottom:0">Full class-by-class diagram: <a href="uml.html" style="color:var(--lilac-700);font-weight:700">open the UML →</a></p>
-    </div>
-    <p><strong>Proof we built incrementally:</strong> the app is ~40 small commits
-      on GitHub, each one a single brick, in this exact order. The history <em>is</em>
-      the documentation.</p>
-  </section>
+  <h2 id="s3"><span class="num">3</span>Build order</h2>
+  <ol>
+    <li><strong>Model (data classes).</strong> User, Community, Post, Comment,
+      Message. Built first because every other layer uses them; you cannot design
+      storage without knowing what is being stored.</li>
+    <li><strong>Database and DAOs.</strong> An SQLite database and one data-access
+      class per table. All SQL is confined to these classes, so the storage engine
+      could be replaced without touching anything above.</li>
+    <li><strong>Services (rules).</strong> AuthService (Bilkent-email rule),
+      MatchService (scoring), MbtiService. Built once data access existed, so rules
+      could be layered on top of it.</li>
+    <li><strong>Identity — the first real feature.</strong> Register, login, email
+      verification. Built first among features because, without a user, nothing has
+      an owner — no message, no membership, no match. Identity is the backbone.</li>
+    <li><strong>Onboarding, communities, forum, messages.</strong> In this order,
+      because matching needs the vibe, the forum needs communities, and messaging
+      needs users. Each feature depends on the previous one.</li>
+    <li><strong>Client/server conversion.</strong> Only after the logic worked was
+      the data moved behind a socket server. Correctness is verified first, then the
+      working system is placed on the network.</li>
+    <li><strong>Speed, friends, notifications.</strong> Added last, because the core
+      already functioned; these are refinements.</li>
+  </ol>
 
-  <div class="divider"></div>
+  <h2 id="s4"><span class="num">4</span>Architecture and class reference</h2>
+  <p>The main classes, grouped by layer. Notation: <code>-</code> private field,
+     <code>+</code> public method.</p>
 
-  <!-- ORDER -->
-  <section id="order">
-    <div class="sec-tag">03 · Build order</div>
-    <h2>First this, then that — and why</h2>
-    <div class="steps">
-      <div class="step"><div class="n"></div><div>
-        <h4>Model — the data classes</h4>
-        <p>User, Community, Post, Comment, Message. Plain objects with fields.</p>
-        <p class="why">Why first? Everything uses them. You can't design storage before you know what you're storing.</p>
-      </div></div>
-      <div class="step"><div class="n"></div><div>
-        <h4>Database + DAOs</h4>
-        <p>An SQLite database, and one DAO class per table holding all the SQL.</p>
-        <p class="why">Why here? Model is ready, so each model gets a table. SQL stays in one place so it's swappable.</p>
-      </div></div>
-      <div class="step"><div class="n"></div><div>
-        <h4>Services — the rules</h4>
-        <p>AuthService (Bilkent-email rule), MatchService (scoring), MbtiService.</p>
-        <p class="why">Why here? Now that we can read/write data, we can put rules on top of it.</p>
-      </div></div>
-      <div class="step"><div class="n"></div><div>
-        <h4>Identity — the first real feature</h4>
-        <p>Register, login, email verification.</p>
-        <p class="why">Why first feature? Without a user, nothing has an owner — whose message, whose membership? Identity is the backbone.</p>
-      </div></div>
-      <div class="step"><div class="n"></div><div>
-        <h4>Onboarding → communities → forum → messages</h4>
-        <p>Interests + vibe test, then matched communities, then discussions, then DMs.</p>
-        <p class="why">Why this order? Matching needs the vibe; the forum needs communities; messages need users. Each leans on the previous.</p>
-      </div></div>
-      <div class="step"><div class="n"></div><div>
-        <h4>Turn it into a client/server app</h4>
-        <p>Only after the logic worked did we move the data behind a socket server.</p>
-        <p class="why">Why so late? You make sure the logic is correct first, then put it on the network. Moving a broken thing onto a network is twice the trouble.</p>
-      </div></div>
-      <div class="step"><div class="n"></div><div>
-        <h4>Speed, friends, notifications — last</h4>
-        <p>Background loading, friend requests, the notification bell.</p>
-        <p class="why">Why last? The core already works; these are the polish and the paint.</p>
-      </div></div>
-    </div>
-  </section>
+  <h3>Layer 1 — model</h3>
+  <div class="uml">
+    <div class="cn">User <small>· model</small></div>
+    <div class="sec">- username, displayName, email, passHash, salt, bio, verified, mbtiType, interests[]</div>
+    <div class="sec">+ hasVibe()</div>
+  </div>
+  <div class="uml">
+    <div class="cn">Community</div>
+    <div class="sec">- id, name, description, category, emoji, tags[], memberCount, matchPercent, member</div>
+  </div>
+  <div class="uml">
+    <div class="cn">Post &nbsp;/&nbsp; Comment &nbsp;/&nbsp; Message</div>
+    <div class="sec">Post: - id, communityId, author, title, body, commentCount</div>
+    <div class="sec">Comment: - id, postId, author, body, <b>parentId</b> (0 = top-level, &gt;0 = reply to that comment)</div>
+    <div class="sec">Message: - id, sender, receiver, body, createdAt, read</div>
+  </div>
+  <div class="uml">
+    <div class="cn">MbtiResult &nbsp;/&nbsp; Notification</div>
+    <div class="sec">MbtiResult: - type (e.g. INFP), eiPercent, snPercent, tfPercent, jpPercent</div>
+    <div class="sec">Notification: - id, username, type, text, createdAt, read</div>
+  </div>
 
-  <div class="divider"></div>
+  <h3>Layer 2 — data (SQL only here)</h3>
+  <div class="uml">
+    <div class="cn">Db <small>· SQLite</small></div>
+    <div class="sec">+ connect() &nbsp; + getConnection() &nbsp; + close() &nbsp; <span class="k">// creates all tables</span></div>
+  </div>
+  <div class="uml">
+    <div class="cn">UserDao</div>
+    <div class="sec">+ insert() + findByUsername() + findByEmail() + setVerified() + updateMbti() + get/setInterests()</div>
+  </div>
+  <div class="uml">
+    <div class="cn">CommunityDao</div>
+    <div class="sec">+ insert() + getAll() + getByCategory() + search() + join() + leave() + isMember() + getJoined() + memberCount()</div>
+  </div>
+  <div class="uml">
+    <div class="cn">PostDao &nbsp;/&nbsp; MessageDao &nbsp;/&nbsp; FriendDao &nbsp;/&nbsp; NotificationDao</div>
+    <div class="sec">PostDao: + insertPost() + getPostsForCommunity() + insertComment() + getComments()</div>
+    <div class="sec">MessageDao: + send() + getConversation() + getPartners()</div>
+    <div class="sec">FriendDao: + request() + accept() + decline() + areFriends() + getFriends() + getIncomingRequests()</div>
+    <div class="sec">NotificationDao: + insert() + forUser() + unreadCount() + markAllRead()</div>
+  </div>
 
-  <!-- EMAIL -->
-  <section id="email">
-    <div class="sec-tag">04 · A closer look</div>
-    <h2>How email verification works</h2>
-    <p class="lead">We only let Bilkent students in, and we prove the email is
-      really theirs before the account becomes usable.</p>
-    <div class="flow"><span class="c">// the flow, step by step</span>
-1. user types name + <span class="g">@ug.bilkent.edu.tr</span> + password
-2. <span class="k">AuthService.register()</span> checks: right domain? username free? → save (unverified)
-3. server makes a random <span class="k">6-digit code</span>, keeps it in memory
-4. <span class="k">EmailSender</span> mails the code over SMTP (JavaMail)
-   <span class="c">// if SMTP isn't set up, the code shows in a popup so it still works</span>
-5. user types the code → server compares → marks the account <span class="g">verified</span>
-6. login is refused until <span class="k">verified == true</span></div>
-    <div class="qa">
-      <div class="q">Q: Why keep a fallback popup?</div>
-      <div class="a">So the app runs and can be graded even on a machine with no email
-        credentials set up. Real emails need a private password we never commit to
-        GitHub, so the fallback keeps it working without leaking secrets.</div>
-    </div>
-    <div class="qa">
-      <div class="q">Q: Where is the password stored?</div>
-      <div class="a">Never in plain text. We store a <strong>salted SHA-256 hash</strong>
-        (PasswordUtil). Each user gets a random salt; we hash salt + password. The
-        server never even sends the hash to a client.</div>
-    </div>
-  </section>
+  <h3>Layer 3 — service (rules)</h3>
+  <div class="uml">
+    <div class="cn">AuthService &nbsp;/&nbsp; MatchService &nbsp;/&nbsp; MbtiService &nbsp;/&nbsp; CommunityService</div>
+    <div class="sec">AuthService: + register() + login() + markVerified() + generateVerificationCode()</div>
+    <div class="sec">MatchService: + scoreFor(user, community) + topMatches() + reason() &nbsp; <span class="k">// interests 65% + personality 35%</span></div>
+    <div class="sec">MbtiService: + getQuestions() + score(answers) + archetypeName/Emoji/Blurb()</div>
+    <div class="sec">CommunityService: + getAll() + search() + join() + leave() + getJoined() + isMember()</div>
+  </div>
 
-  <div class="divider"></div>
+  <h3>Layer 4 — server (network + concurrency)</h3>
+  <div class="uml">
+    <div class="cn">ChatServer</div>
+    <div class="sec">- online { username &rarr; handler }</div>
+    <div class="sec">+ start() <span class="k">// accept loop</span> &nbsp; + register() + unregister() + pushTo() + pushToMany()</div>
+  </div>
+  <div class="uml">
+    <div class="cn">ClientHandler <small>· Runnable</small> &nbsp;/&nbsp; RequestRouter</div>
+    <div class="sec">ClientHandler: + run() <span class="k">// read &rarr; route &rarr; write</span> &nbsp; + send(response)</div>
+    <div class="sec">RequestRouter: + handle(request) <span class="k">// maps an action name to the right handler</span></div>
+  </div>
+  <div class="uml">
+    <div class="cn">Handlers</div>
+    <div class="sec">AuthHandler: + register() + verify() + login()</div>
+    <div class="sec">CommunityHandler: + list() + join() + homeMatches() + scoreOne()</div>
+    <div class="sec">ForumHandler: + createPost() + addComment() &nbsp; <span class="k">// pushes forumUpdate</span></div>
+    <div class="sec">MessageHandler: + send() &nbsp; <span class="k">// checks friendship, then pushes</span></div>
+    <div class="sec">FriendHandler: + sendRequest() + respond() + friends() + requests()</div>
+    <div class="sec">NotificationHandler: + list() + unread() + markRead()</div>
+    <div class="sec">Notifier + notify() &nbsp;·&nbsp; Dto + safeUser() <span class="k">// strips the password hash</span></div>
+  </div>
 
-  <!-- SOCKETS -->
-  <section id="sockets">
-    <div class="sec-tag">05 · The important one</div>
-    <h2>Sockets: what, why, how</h2>
+  <h3>Layer 5 — net (client bridge)</h3>
+  <div class="uml">
+    <div class="cn">Api <small>· facade</small> &nbsp;/&nbsp; ServerClient <small>· singleton</small></div>
+    <div class="sec">Api: + login() + homeMatches() + posts() + sendMessage() + sendFriendRequest() + notifications() ...</div>
+    <div class="sec">ServerClient: - socket, pending{}, listeners[] &nbsp; + connect() + send(action, data) + addPushListener()</div>
+    <div class="sec">protocol: Request(id, action, data), Response(type, ok, error, event, data), Json, Params</div>
+  </div>
 
-    <h3>What is a socket?</h3>
-    <p>A socket is a live, two-way pipe between two programs over the network. Once
-      it's open, either side can send bytes down it at any time — like a phone call
-      that stays connected, versus sending one letter and waiting for a reply.</p>
+  <h3>Layer 6 — ui / screens</h3>
+  <div class="uml">
+    <div class="cn">Screens (Java Swing JPanels)</div>
+    <div class="sec">MainWindow: + navigate() + openCommunity() + onPush() <span class="k">// forwards a push to the open screen</span></div>
+    <div class="sec">LoginScreen, RegisterScreen, VerifyScreen, InterestPanel, MbtiTestPanel, VibeResultPanel,</div>
+    <div class="sec">HomePanel, DiscoverPanel, CommunityDetailPanel, PostDetailPanel, MessagesPanel,</div>
+    <div class="sec">NotificationsPanel, ProfilePanel, SettingsPanel &nbsp;·&nbsp; ui: Theme, RoundedButton, CommunityCard, BackgroundTask</div>
+  </div>
 
-    <h3>Why did we need one?</h3>
-    <p>A community app has <strong>many people on different computers</strong> who
-      must see the same thing. That needs two things a single desktop program can't
-      do: (1) <strong>one shared place</strong> for all the data, and (2) a way for
-      the server to say <em>"something new happened"</em> without the user constantly
-      asking. Both are solved by keeping an open socket to a central server.</p>
-    <p>It also means we <strong>don't pay for a service like Supabase</strong> — our
-      server <em>is</em> our shared database + real-time, and one server can host
-      many apps.</p>
+  <h2 id="s5"><span class="num">5</span>Email verification</h2>
+  <p>Only Bilkent students may register, and the email is confirmed before the
+     account can be used. The sequence is:</p>
+  <ol>
+    <li>The user enters a name, a Bilkent email, and a password.</li>
+    <li><code>AuthService.register()</code> checks the email domain and that the
+      username and email are not already taken, then saves the account as
+      <em>unverified</em>.</li>
+    <li>The server generates a random 6-digit code and keeps it in memory.</li>
+    <li><code>EmailSender</code> sends the code by SMTP (JavaMail). If SMTP is not
+      configured, the code is shown in a dialog so the application still works.</li>
+    <li>The user enters the code; the server compares it and marks the account
+      <em>verified</em>. Login is refused until the account is verified.</li>
+  </ol>
+  <div class="qa">
+    <p class="q">Why the dialog fallback?</p>
+    <p>Sending real email requires a private password, which is never committed to
+       the repository. The fallback lets the application run and be evaluated on a
+       machine with no email credentials, without exposing any secret.</p>
+  </div>
+  <div class="qa">
+    <p class="q">How is the password stored?</p>
+    <p>Never in plain text. Each user has a random salt, and the stored value is a
+       SHA-256 hash of the salt combined with the password (<code>PasswordUtil</code>).
+       The server never sends the hash to a client.</p>
+  </div>
 
-    <h3>How ours works</h3>
-    <p>We wrote the server ourselves with plain Java sockets
-      (<code>java.net.ServerSocket</code>) — no external networking library. Messages
-      on the wire are single lines of JSON.</p>
-    <div class="flow"><span class="c">// server side (ChatServer)</span>
-<span class="k">while (true)</span> {
-    Socket s = serverSocket.<span class="g">accept()</span>;      <span class="c">// wait for a client</span>
-    <span class="k">new Thread</span>(new ClientHandler(s)).start(); <span class="c">// one thread each → many at once</span>
+  <h2 id="s6"><span class="num">6</span>Sockets and real-time communication</h2>
+  <p><strong>What a socket is.</strong> A socket is a persistent two-way connection
+     between two programs over a network. Once open, either side may send data at any
+     time — comparable to a telephone call that stays connected, rather than sending
+     a single letter and waiting for a reply.</p>
+  <p><strong>Why it is needed.</strong> A community application has many users on
+     different computers who must see the same data. This requires (a) a single
+     shared store for the data, and (b) a way for the server to notify a user that
+     something has happened without the user repeatedly asking. A persistent socket
+     to a central server provides both. It also avoids paying for a hosted service:
+     the server is itself the shared database and the real-time channel.</p>
+  <p><strong>How it works here.</strong> The server was written with plain Java
+     sockets (<code>java.net.ServerSocket</code>), with no external networking
+     library. Messages are single lines of JSON.</p>
+  <pre>// server accept loop (ChatServer)
+while (true) {
+    Socket s = serverSocket.accept();          // wait for a client
+    new Thread(new ClientHandler(s)).start();  // one thread per client
 }
 
-<span class="c">// request / reply (client asks, server answers, matched by id)</span>
-client → <span class="g">{"id":4,"action":"login","data":{...}}</span>
-server → <span class="g">{"type":"reply","id":4,"ok":true,"data":{...}}</span>
+// request / reply, matched by id
+client -> {"id":4,"action":"login","data":{...}}
+server -> {"type":"reply","id":4,"ok":true,"data":{...}}
 
-<span class="c">// the real-time part: server pushes on its own</span>
-someone sends you a DM →
-   <span class="k">ChatServer.pushTo(</span>you<span class="k">,</span> <span class="p">{"type":"push","event":"newMessage",...}</span><span class="k">)</span>
-   <span class="c">// it goes straight down your socket — you didn't ask, no refreshing</span></div>
-    <div class="pillars">
-      <div class="pillar"><div class="e">🧵</div><h4>Thread per client</h4><p>Each connection runs on its own thread, so many people are online at once.</p></div>
-      <div class="pillar"><div class="e">🗺️</div><h4>Online map</h4><p>The server tracks <code>username → socket</code> so it knows where to push.</p></div>
-      <div class="pillar"><div class="e">⚡</div><h4>Push, not poll</h4><p>New messages/notifications are pushed instantly — we never re-query the DB in a loop.</p></div>
-    </div>
-    <div class="qa">
-      <div class="q">Q: Why plain sockets and not a big framework?</div>
-      <div class="a">It's clearer to explain and defend, has zero dependencies, and
-        it's classic socket programming. The same design also lets a future iOS app
-        connect to the <strong>same</strong> server — the server never changes.</div>
-    </div>
-  </section>
+// real-time push: the server sends without being asked
+// when a direct message is sent to you:
+ChatServer.pushTo(you, {"type":"push","event":"newMessage",...})
+// it arrives on your socket immediately; no polling, no reloading</pre>
+  <p>The server keeps a map of <code>username → socket</code> for connected users, so
+     it knows where to deliver a push. Real-time messaging and forum updates use this
+     mechanism.</p>
+  <div class="qa">
+    <p class="q">Why plain sockets rather than a framework?</p>
+    <p>They are simpler to explain, have no dependencies, and represent classic socket
+       programming. The same server can later serve a second client (for example an
+       iOS application) without any change to the server itself.</p>
+  </div>
 
-  <div class="divider"></div>
+  <h2 id="s7"><span class="num">7</span>Friends and privacy</h2>
+  <p>A user cannot message an arbitrary person. Messaging is restricted to friends,
+     following the model people already know from other applications:</p>
+  <ol>
+    <li>A friend request is sent and stored with status <em>pending</em>.</li>
+    <li>The recipient receives a real-time push and a notification.</li>
+    <li>When the recipient accepts, the status becomes <em>accepted</em>.</li>
+    <li>Only then does <code>MessageHandler.send()</code> permit a message between
+      the two users. A message to a non-friend is refused by the server.</li>
+  </ol>
+  <p>The rule is enforced on the server, not in the screen, because the screen can be
+     bypassed but the server cannot. The check lives in one place, so it holds for the
+     current desktop client and any future client.</p>
 
-  <!-- PRIVACY -->
-  <section id="privacy">
-    <div class="sec-tag">06 · Friends &amp; privacy</div>
-    <h2>Not everyone can message everyone</h2>
-    <p class="lead">Random people shouldn't be able to DM you. So messaging is
-      gated by friendship, just like the apps people already know.</p>
-    <div class="flow">1. you send a <span class="k">friend request</span> (FriendDao stores it as "pending")
-2. the other person gets a <span class="p">real-time push</span> + a notification
-3. they <span class="g">accept</span> → status becomes "accepted"
-4. only now does <span class="k">MessageHandler.send()</span> allow a DM between you
-   <span class="c">// a message to a non-friend is refused by the server</span></div>
-    <p>Notifications work the same way: friend requests, accepted requests, new
-      messages and replies each create a stored notification <em>and</em> push a live
-      update, so the bell's unread count changes on its own.</p>
-    <div class="qa">
-      <div class="q">Q: Why enforce it on the server, not the screen?</div>
-      <div class="a">Because the screen can be bypassed, the server can't. The rule
-        lives in one place (<code>MessageHandler.send</code>) so it always holds,
-        for the desktop app today and any client tomorrow.</div>
-    </div>
-  </section>
+  <h2 id="s8"><span class="num">8</span>Notifications</h2>
+  <p>Friend requests, accepted requests, new messages, and replies each create a
+     stored notification and push a live update. Stored notifications remain available
+     when the user logs in later; the live push updates the notification bell's unread
+     count immediately for a user who is online.</p>
 
-  <div class="divider"></div>
+  <h2 id="s9"><span class="num">9</span>Summary</h2>
+  <p>vibematch was built in the direction of its dependencies: model, then storage,
+     then rules, then identity, then content, then interaction, then the network, and
+     finally the refinements. No component was built before the component it depends
+     on. The layered structure keeps each part independent, the socket server provides
+     shared data and real-time updates, and the friendship rule provides privacy. The
+     class diagram is available at <a href="uml.html">uml.html</a>.</p>
 
-  <section style="text-align:center">
-    <h2>The one sentence to defend it</h2>
-    <p class="lead" style="max-width:640px;margin-inline:auto">“We built it in the
-      direction of its dependencies — model → storage → rules → identity → content
-      → interaction → network → extras. No brick was ever laid before the brick it
-      rests on.”</p>
-    <div class="cta"><a href="uml.html">See the full class diagram →</a></div>
-  </section>
+  <div class="note">
+    vibematch · technical documentation · source at
+    <a href="https://github.com/nosey-dewdrop/vibematch">github.com/nosey-dewdrop/vibematch</a>
+  </div>
 
 </div>
-
-<footer>
-  vibematch · Bilkent student community · built brick by brick ·
-  <a href="https://github.com/nosey-dewdrop/vibematch">source on GitHub</a>
-</footer>
-
 </body>
 </html>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>vibematch — UML Sınıf Diyagramı</title>
+<title>vibematch — UML Class Diagram</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Quicksand:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -57,24 +57,24 @@ body{font-family:'Quicksand',sans-serif;color:var(--ink);
 .c-model{background:#e0788b}.c-data{background:#6f8fd6}.c-service{background:#5cc09a}
 .c-net{background:#c9a227}.c-server{background:#f59e8b}.c-ui{background:var(--lilac-600)}
 .foundation{border:2px dashed var(--lilac-400)}
-.foundation .pkg-head h2:after{content:" · TEMEL";font-family:'JetBrains Mono';font-size:12px;color:var(--lilac-500)}
+.foundation .pkg-head h2:after{content:" · FOUNDATION";font-family:'JetBrains Mono';font-size:12px;color:var(--lilac-500)}
 </style>
 </head>
 <body>
 
 <div class="head">
-  <h1>vibematch — <em>UML</em> Sınıf Diyagramı</h1>
-  <p>Her kutu: <b>ad</b> / <b>alanlar (−private)</b> / <b>metotlar (+public)</b>. En üstteki (1) temel; her kat üstündekine bağlı (▲).</p>
+  <h1>vibematch — <em>UML</em> Class Diagram</h1>
+  <p>Each box: <b>name</b> / <b>fields (−private)</b> / <b>methods (+public)</b>. Top (1) is the foundation; each layer depends on the one above (▲).</p>
 </div>
 <div class="legend">
-  <span>− private alan</span><span>+ public metot</span><span>▲ depends on</span><span>◇→ has-a (kendine referans)</span>
+  <span>− private field</span><span>+ public method</span><span>▲ depends on</span><span>◇→ has-a (self reference)</span>
 </div>
 
 <div class="stack">
 
   <!-- 1 MODEL -->
   <div class="pkg t-model foundation">
-    <div class="pkg-head"><span class="no c-model">1</span><h2>Veri</h2><code>model</code><span class="role">sadece veri · her şeyin temeli</span></div>
+    <div class="pkg-head"><span class="no c-model">1</span><h2>Data</h2><code>model</code><span class="role">just data · the foundation</span></div>
     <div class="cards">
       <div class="cls"><div class="name">User</div>
         <div class="attr"><span>-</span>username, displayName, email<br><span>-</span>passHash, salt, bio<br><span>-</span>verified, mbtiType, interests[]</div>
@@ -86,7 +86,7 @@ body{font-family:'Quicksand',sans-serif;color:var(--ink);
         <div class="attr"><span>-</span>id, communityId<br><span>-</span>author, title, body<br><span>-</span>commentCount</div>
         <div class="meth"><span>+</span>get/set...</div></div>
       <div class="cls"><div class="name">Comment</div>
-        <div class="attr"><span>-</span>id, postId, author<br><span>-</span>body, <b>parentId</b> ◇→ self<br><span class="cmt">// 0=üst, &gt;0=cevap</span></div>
+        <div class="attr"><span>-</span>id, postId, author<br><span>-</span>body, <b>parentId</b> ◇→ self<br><span class="cmt">// 0=top-level, &gt;0=reply</span></div>
         <div class="meth"><span>+</span>isTopLevel(): boolean</div></div>
       <div class="cls"><div class="name">Message</div>
         <div class="attr"><span>-</span>id, sender, receiver<br><span>-</span>body, createdAt, read</div>
@@ -98,20 +98,20 @@ body{font-family:'Quicksand',sans-serif;color:var(--ink);
         <div class="attr"><span>-</span>id, username, type<br><span>-</span>text, createdAt, read</div>
         <div class="meth"><span>+</span>get/set...</div></div>
       <div class="cls"><div class="name">Interests / Categories<small>&lt;&lt;static&gt;&gt;</small></div>
-        <div class="attr"><span>-</span>ALL[] <span class="cmt">// ilgi, kategori listeleri</span></div>
+        <div class="attr"><span>-</span>ALL[] <span class="cmt">// interest & category lists</span></div>
         <div class="meth"><span>+</span>emojiFor(name): String</div></div>
     </div>
   </div>
 
-  <div class="between"><span class="line">▲</span> DAO'lar model'i kullanır</div>
+  <div class="between"><span class="line">▲</span> DAOs use the model</div>
 
   <!-- 2 DATA -->
   <div class="pkg t-data">
-    <div class="pkg-head"><span class="no c-data">2</span><h2>Erişim &amp; Depolama</h2><code>data</code><span class="role">SQL sadece burada</span></div>
+    <div class="pkg-head"><span class="no c-data">2</span><h2>Access &amp; Storage</h2><code>data</code><span class="role">SQL only here</span></div>
     <div class="cards">
       <div class="cls"><div class="name">Db<small>&lt;&lt;SQLite&gt;&gt;</small></div>
         <div class="attr"><span>-</span>connection</div>
-        <div class="meth"><span>+</span>connect() <span>+</span>getConnection()<br><span>+</span>close() <span class="cmt">// tabloları kurar</span></div></div>
+        <div class="meth"><span>+</span>connect() <span>+</span>getConnection()<br><span>+</span>close() <span class="cmt">// creates the tables</span></div></div>
       <div class="cls"><div class="name">UserDao</div>
         <div class="meth"><span>+</span>insert(u) <span>+</span>findByUsername()<br><span>+</span>findByEmail() <span>+</span>emailExists()<br><span>+</span>setVerified() <span>+</span>updateMbti()<br><span>+</span>get/setInterests()</div></div>
       <div class="cls"><div class="name">CommunityDao</div>
@@ -125,20 +125,20 @@ body{font-family:'Quicksand',sans-serif;color:var(--ink);
       <div class="cls"><div class="name">NotificationDao</div>
         <div class="meth"><span>+</span>insert()<br><span>+</span>forUser()<br><span>+</span>unreadCount()<br><span>+</span>markAllRead()</div></div>
       <div class="cls"><div class="name">SampleData<small>&lt;&lt;seed&gt;&gt;</small></div>
-        <div class="meth"><span>+</span>seedIfNeeded()<br><span class="cmt">// ilk açılışta örnek veri</span></div></div>
+        <div class="meth"><span>+</span>seedIfNeeded()<br><span class="cmt">// sample data on first run</span></div></div>
     </div>
   </div>
 
-  <div class="between"><span class="line">▲</span> servisler DAO'ları çağırır</div>
+  <div class="between"><span class="line">▲</span> services call DAOs</div>
 
   <!-- 3 SERVICE -->
   <div class="pkg t-service">
-    <div class="pkg-head"><span class="no c-service">3</span><h2>Kurallar</h2><code>service</code><span class="role">iş mantığı</span></div>
+    <div class="pkg-head"><span class="no c-service">3</span><h2>Rules</h2><code>service</code><span class="role">business logic</span></div>
     <div class="cards">
       <div class="cls"><div class="name">AuthService</div>
         <div class="meth"><span>+</span>register(name,user,mail,pass)<br><span>+</span>login(userOrMail,pass)<br><span>+</span>markVerified()<br><span>+</span>generateVerificationCode()</div></div>
       <div class="cls"><div class="name">MatchService</div>
-        <div class="meth"><span>+</span>scoreFor(user,comm): int<br><span>+</span>topMatches(user,list,n)<br><span>+</span>reason(user,comm)<br><span class="cmt">// ilgi %65 + mbti %35</span></div></div>
+        <div class="meth"><span>+</span>scoreFor(user,comm): int<br><span>+</span>topMatches(user,list,n)<br><span>+</span>reason(user,comm)<br><span class="cmt">// interests 65% + mbti 35%</span></div></div>
       <div class="cls"><div class="name">MbtiService</div>
         <div class="meth"><span>+</span>getQuestions()<br><span>+</span>score(answers[]): MbtiResult<br><span>+</span>archetypeName/Emoji/Blurb()</div></div>
       <div class="cls"><div class="name">CommunityService</div>
@@ -146,20 +146,20 @@ body{font-family:'Quicksand',sans-serif;color:var(--ink);
     </div>
   </div>
 
-  <div class="between"><span class="line">▲</span> handler'lar servisleri çağırır</div>
+  <div class="between"><span class="line">▲</span> handlers call services</div>
 
   <!-- 4 SERVER -->
   <div class="pkg t-server">
-    <div class="pkg-head"><span class="no c-server">4</span><h2>Sunucu</h2><code>server</code><span class="role">ağ + eşzamanlılık (soket)</span></div>
+    <div class="pkg-head"><span class="no c-server">4</span><h2>Server</h2><code>server</code><span class="role">network + concurrency (sockets)</span></div>
     <div class="cards">
       <div class="cls"><div class="name">ChatServer</div>
         <div class="attr"><span>-</span>online{ user → handler }</div>
         <div class="meth"><span>+</span>start() <span class="cmt">// accept loop</span><br><span>+</span>register() <span>+</span>unregister()<br><span>+</span>pushTo() <span>+</span>pushToMany()</div></div>
       <div class="cls"><div class="name">ClientHandler<small>implements Runnable</small></div>
         <div class="attr"><span>-</span>socket, in, out, username</div>
-        <div class="meth"><span>+</span>run() <span class="cmt">// oku→yönlendir→yaz</span><br><span>+</span>send(response)</div></div>
+        <div class="meth"><span>+</span>run() <span class="cmt">// read → route → write</span><br><span>+</span>send(response)</div></div>
       <div class="cls"><div class="name">RequestRouter</div>
-        <div class="meth"><span>+</span>handle(req, client)<br><span class="cmt">// action → doğru handler</span></div></div>
+        <div class="meth"><span>+</span>handle(req, client)<br><span class="cmt">// action → right handler</span></div></div>
       <div class="cls"><div class="name">AuthHandler</div>
         <div class="meth"><span>+</span>register() <span>+</span>verify()<br><span>+</span>resend() <span>+</span>login()</div></div>
       <div class="cls"><div class="name">ProfileHandler</div>
@@ -169,21 +169,21 @@ body{font-family:'Quicksand',sans-serif;color:var(--ink);
       <div class="cls"><div class="name">ForumHandler</div>
         <div class="meth"><span>+</span>posts() <span>+</span>createPost()<br><span>+</span>comments() <span>+</span>addComment()<br><span class="cmt">// +push forumUpdate</span></div></div>
       <div class="cls"><div class="name">MessageHandler</div>
-        <div class="meth"><span>+</span>partners() <span>+</span>conversation()<br><span>+</span>send() <span class="cmt">// arkadaş kontrolü + push</span><br><span>+</span>findUser()</div></div>
+        <div class="meth"><span>+</span>partners() <span>+</span>conversation()<br><span>+</span>send() <span class="cmt">// friendship check + push</span><br><span>+</span>findUser()</div></div>
       <div class="cls"><div class="name">FriendHandler</div>
         <div class="meth"><span>+</span>sendRequest() <span>+</span>respond()<br><span>+</span>friends() <span>+</span>requests()<br><span>+</span>status()</div></div>
       <div class="cls"><div class="name">NotificationHandler</div>
         <div class="meth"><span>+</span>list() <span>+</span>unread()<br><span>+</span>markRead()</div></div>
       <div class="cls"><div class="name">Notifier / Dto<small>&lt;&lt;helper&gt;&gt;</small></div>
-        <div class="meth"><span>+</span>notify(server,user,type,text)<br><span>+</span>safeUser() <span class="cmt">// şifreyi gizler</span></div></div>
+        <div class="meth"><span>+</span>notify(server,user,type,text)<br><span>+</span>safeUser() <span class="cmt">// hides the password</span></div></div>
     </div>
   </div>
 
-  <div class="between"><span class="line">▲</span> istemci sokete bağlanır (JSON: istek/cevap + push)</div>
+  <div class="between"><span class="line">▲</span> client connects over a socket (JSON: request/reply + push)</div>
 
   <!-- 5 NET -->
   <div class="pkg t-net">
-    <div class="pkg-head"><span class="no c-net">5</span><h2>İstemci Köprüsü</h2><code>net · protocol</code><span class="role">sunucuya bağlanır</span></div>
+    <div class="pkg-head"><span class="no c-net">5</span><h2>Client Bridge</h2><code>net · protocol</code><span class="role">connects to the server</span></div>
     <div class="cards">
       <div class="cls"><div class="name">Api<small>&lt;&lt;facade&gt;&gt;</small></div>
         <div class="meth"><span>+</span>login() <span>+</span>register() <span>+</span>verify()<br><span>+</span>homeMatches() <span>+</span>listCommunities()<br><span>+</span>posts() <span>+</span>createPost() <span>+</span>addComment()<br><span>+</span>conversation() <span>+</span>sendMessage()<br><span>+</span>sendFriendRequest() <span>+</span>respondToRequest()<br><span>+</span>notifications() <span>+</span>unreadCount()</div></div>
@@ -200,20 +200,20 @@ body{font-family:'Quicksand',sans-serif;color:var(--ink);
     </div>
   </div>
 
-  <div class="between"><span class="line">▲</span> ekranlar Api'yi çağırır (SQL/kural bilmez)</div>
+  <div class="between"><span class="line">▲</span> screens call the Api (no SQL / no rules)</div>
 
   <!-- 6 UI / SCREENS -->
   <div class="pkg t-ui">
-    <div class="pkg-head"><span class="no c-ui">6</span><h2>Arayüz</h2><code>ui / screens</code><span class="role">kullanıcının gördüğü (JPanel)</span></div>
+    <div class="pkg-head"><span class="no c-ui">6</span><h2>Interface</h2><code>ui / screens</code><span class="role">what the user sees (JPanel)</span></div>
     <div class="cards">
-      <div class="cls"><div class="name">MainWindow<small>koordinatör · PushListener</small></div>
-        <div class="meth"><span>+</span>navigate(key)<br><span>+</span>showHome/Discover/Messages...()<br><span>+</span>openCommunity() <span>+</span>openPost()<br><span>+</span>onPush() <span class="cmt">// aktif ekrana ilet</span></div></div>
+      <div class="cls"><div class="name">MainWindow<small>coordinator · PushListener</small></div>
+        <div class="meth"><span>+</span>navigate(key)<br><span>+</span>showHome/Discover/Messages...()<br><span>+</span>openCommunity() <span>+</span>openPost()<br><span>+</span>onPush() <span class="cmt">// forward to active screen</span></div></div>
       <div class="cls"><div class="name">MbtiTestPanel</div>
         <div class="meth"><span>-</span>render() <span>-</span>answer(choice)<br><span>-</span>finish() <span class="cmt">// api.submitMbti</span></div></div>
       <div class="cls"><div class="name">HomePanel · DiscoverPanel</div>
-        <div class="meth"><span>-</span>loadMatches() / loadAll()<br><span class="cmt">// BackgroundTask ile arka planda</span></div></div>
+        <div class="meth"><span>-</span>loadMatches() / loadAll()<br><span class="cmt">// in the background via BackgroundTask</span></div></div>
       <div class="cls"><div class="name">CommunityDetailPanel<small>PushListener</small></div>
-        <div class="meth"><span>-</span>buildPostList()<br><span>+</span>onPush() <span class="cmt">// forumUpdate → tazele</span></div></div>
+        <div class="meth"><span>-</span>buildPostList()<br><span>+</span>onPush() <span class="cmt">// forumUpdate → refresh</span></div></div>
       <div class="cls"><div class="name">PostDetailPanel<small>PushListener</small></div>
         <div class="meth"><span>-</span>buildCommentTree() <span class="cmt">// threading</span><br><span>+</span>onPush()</div></div>
       <div class="cls"><div class="name">MessagesPanel<small>PushListener</small></div>
@@ -222,8 +222,8 @@ body{font-family:'Quicksand',sans-serif;color:var(--ink);
         <div class="meth"><span>-</span>load() / buildCard()</div></div>
       <div class="cls"><div class="name">Login · Register · Verify</div>
         <div class="meth"><span>-</span>doLogin() / doRegister() / doVerify()</div></div>
-      <div class="cls"><div class="name">ui: Theme · RoundedButton<br>CommunityCard · Chip · BackgroundTask<small>ortak parçalar</small></div>
-        <div class="meth"><span>+</span>heading()/body() <span>+</span>start()<br><span class="cmt">// renk, font, buton, arka plan iş</span></div></div>
+      <div class="cls"><div class="name">ui: Theme · RoundedButton<br>CommunityCard · Chip · BackgroundTask<small>shared parts</small></div>
+        <div class="meth"><span>+</span>heading()/body() <span>+</span>start()<br><span class="cmt">// color, font, button, background work</span></div></div>
     </div>
   </div>
 
