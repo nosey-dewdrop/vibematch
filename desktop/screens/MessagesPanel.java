@@ -2,7 +2,6 @@ package screens;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -30,9 +29,12 @@ import ui.Theme;
 import ui.UiHelper;
 
 /*
- * Direct messages, 1 on 1. Left side lists the people you've talked to, right
- * side is the open conversation with a box to type in. Not real time, it just
- * reloads when you send something.
+ * Direct messages, 1 on 1, but only with your FRIENDS. The left side shows your
+ * friends (people you can chat with) and, above them, any friend requests
+ * waiting for you to accept or decline. The + button sends a friend request.
+ *
+ * Because of the friends rule, random people can't message you: you both have to
+ * be friends first.
  */
 public class MessagesPanel extends JPanel implements net.PushListener {
 
@@ -42,7 +44,7 @@ public class MessagesPanel extends JPanel implements net.PushListener {
 
     private String selectedPartner = null;
     private JPanel centerHolder;
-    private JPanel partnersHolder;
+    private JPanel leftList;
     private JTextField input = new JTextField();
 
     public MessagesPanel(MainWindow main, User user) {
@@ -60,14 +62,14 @@ public class MessagesPanel extends JPanel implements net.PushListener {
         centerHolder.setBorder(BorderFactory.createEmptyBorder(0, 18, 0, 0));
         add(centerHolder, BorderLayout.CENTER);
 
-        refreshPartners();
+        refreshLeft();
         showConversation();
     }
 
     private JPanel buildLeft() {
         JPanel left = new JPanel(new BorderLayout());
         left.setOpaque(false);
-        left.setPreferredSize(new Dimension(230, 10));
+        left.setPreferredSize(new Dimension(240, 10));
 
         JPanel top = new JPanel(new BorderLayout());
         top.setOpaque(false);
@@ -77,19 +79,19 @@ public class MessagesPanel extends JPanel implements net.PushListener {
         plus.setFont(Theme.heading(20));
         plus.setForeground(Theme.LILAC_600);
         plus.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        plus.setToolTipText("New message");
+        plus.setToolTipText("Add a friend");
         plus.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                newConversation();
+                addFriend();
             }
         });
         top.add(plus, BorderLayout.EAST);
         left.add(top, BorderLayout.NORTH);
 
-        partnersHolder = new JPanel();
-        partnersHolder.setOpaque(false);
-        partnersHolder.setLayout(new BoxLayout(partnersHolder, BoxLayout.Y_AXIS));
-        JScrollPane scroll = new JScrollPane(partnersHolder);
+        leftList = new JPanel();
+        leftList.setOpaque(false);
+        leftList.setLayout(new BoxLayout(leftList, BoxLayout.Y_AXIS));
+        JScrollPane scroll = new JScrollPane(leftList);
         scroll.setBorder(null);
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(false);
@@ -98,42 +100,105 @@ public class MessagesPanel extends JPanel implements net.PushListener {
         return left;
     }
 
-    private void refreshPartners() {
-        partnersHolder.removeAll();
-        ArrayList<String> partners = api.partners(user.getUsername());
-        if (partners.isEmpty()) {
-            partnersHolder.add(UiHelper.muted("No chats yet. Tap + to start one.", 12));
+    // rebuild the left column: incoming requests first, then friends
+    private void refreshLeft() {
+        leftList.removeAll();
+
+        ArrayList<String> requests = api.friendRequests(user.getUsername());
+        if (!requests.isEmpty()) {
+            leftList.add(sectionLabel("FRIEND REQUESTS"));
+            for (int i = 0; i < requests.size(); i++) {
+                leftList.add(buildRequestRow(requests.get(i)));
+                leftList.add(UiHelper.vgap(6));
+            }
+            leftList.add(UiHelper.vgap(10));
         }
-        for (int i = 0; i < partners.size(); i++) {
-            partnersHolder.add(buildPartnerRow(partners.get(i)));
-            partnersHolder.add(UiHelper.vgap(6));
+
+        leftList.add(sectionLabel("FRIENDS"));
+        ArrayList<String> friends = api.friends(user.getUsername());
+        if (friends.isEmpty()) {
+            JLabel empty = UiHelper.muted("No friends yet. Tap + to add one.", 12);
+            empty.setAlignmentX(LEFT_ALIGNMENT);
+            leftList.add(empty);
         }
-        partnersHolder.revalidate();
-        partnersHolder.repaint();
+        for (int i = 0; i < friends.size(); i++) {
+            leftList.add(buildFriendRow(friends.get(i)));
+            leftList.add(UiHelper.vgap(6));
+        }
+
+        leftList.revalidate();
+        leftList.repaint();
     }
 
-    private JPanel buildPartnerRow(final String partner) {
-        boolean active = partner.equals(selectedPartner);
+    private JLabel sectionLabel(String text) {
+        JLabel l = new JLabel(text);
+        l.setFont(Theme.bodyBold(11));
+        l.setForeground(Theme.LILAC_500);
+        l.setAlignmentX(LEFT_ALIGNMENT);
+        l.setBorder(BorderFactory.createEmptyBorder(0, 4, 6, 0));
+        return l;
+    }
+
+    private JPanel buildFriendRow(final String friend) {
+        boolean active = friend.equals(selectedPartner);
         RoundedPanel row = new RoundedPanel(12, active ? Theme.LILAC_100 : Theme.WHITE);
         row.setLayout(new BorderLayout(10, 0));
         row.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
-        row.setMaximumSize(new Dimension(210, 50));
+        row.setMaximumSize(new Dimension(220, 50));
+        row.setAlignmentX(LEFT_ALIGNMENT);
         row.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         JLabel avatar = new JLabel("🙂");
         row.add(avatar, BorderLayout.WEST);
-        JLabel name = new JLabel(partner);
+        JLabel name = new JLabel(friend);
         name.setFont(Theme.bodyBold(13));
         name.setForeground(Theme.INK);
         row.add(name, BorderLayout.CENTER);
 
         row.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                selectedPartner = partner;
-                refreshPartners();
+                selectedPartner = friend;
+                refreshLeft();
                 showConversation();
             }
         });
+        return row;
+    }
+
+    // a pending request with accept / decline buttons
+    private JPanel buildRequestRow(final String requester) {
+        RoundedPanel row = new RoundedPanel(12, Theme.WHITE);
+        row.setLayout(new BorderLayout(8, 4));
+        row.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
+        row.setMaximumSize(new Dimension(220, 78));
+        row.setAlignmentX(LEFT_ALIGNMENT);
+
+        JLabel name = new JLabel(requester + " wants to be friends");
+        name.setFont(Theme.body(12));
+        name.setForeground(Theme.INK);
+        row.add(name, BorderLayout.NORTH);
+
+        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        buttons.setOpaque(false);
+        RoundedButton accept = new RoundedButton("Accept", Theme.LILAC_500, Color.WHITE);
+        accept.setPreferredSize(new Dimension(80, 30));
+        accept.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                api.respondToRequest(user.getUsername(), requester, true);
+                refreshLeft();
+            }
+        });
+        RoundedButton decline = new RoundedButton("Decline", Theme.LILAC_100, Theme.LILAC_700);
+        decline.setPreferredSize(new Dimension(80, 30));
+        decline.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                api.respondToRequest(user.getUsername(), requester, false);
+                refreshLeft();
+            }
+        });
+        buttons.add(accept);
+        buttons.add(decline);
+        row.add(buttons, BorderLayout.SOUTH);
         return row;
     }
 
@@ -142,7 +207,7 @@ public class MessagesPanel extends JPanel implements net.PushListener {
         if (selectedPartner == null) {
             JPanel hint = new JPanel(new java.awt.GridBagLayout());
             hint.setOpaque(false);
-            hint.add(UiHelper.muted("Pick a chat or start a new one to begin.", 14));
+            hint.add(UiHelper.muted("Pick a friend to start chatting.", 14));
             centerHolder.add(hint, BorderLayout.CENTER);
         } else {
             centerHolder.add(buildChatHeader(), BorderLayout.NORTH);
@@ -231,31 +296,17 @@ public class MessagesPanel extends JPanel implements net.PushListener {
         if (text.isEmpty() || selectedPartner == null) {
             return;
         }
-        api.sendMessage(user.getUsername(), selectedPartner, text);
-        refreshPartners();
+        try {
+            api.sendMessage(user.getUsername(), selectedPartner, text);
+        } catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage());
+            return;
+        }
         showConversation();
     }
 
-    /*
-     * The server pushed a message that was sent TO us. This is the real time
-     * bit: if it's from the person we're chatting with right now, reload the
-     * conversation so it appears instantly. Otherwise just refresh the list so
-     * a new chat shows up on the left.
-     */
-    public void onPush(String event, String dataJson) {
-        if (!event.equals("newMessage")) {
-            return;
-        }
-        Message m = protocol.Json.fromJson(dataJson, Message.class);
-        if (selectedPartner != null && m.getSender().equals(selectedPartner)) {
-            showConversation();
-        } else {
-            refreshPartners();
-        }
-    }
-
-    private void newConversation() {
-        String name = JOptionPane.showInputDialog(this, "Who do you want to message? (username)");
+    private void addFriend() {
+        String name = JOptionPane.showInputDialog(this, "Add a friend by username:");
         if (name == null) {
             return;
         }
@@ -263,19 +314,29 @@ public class MessagesPanel extends JPanel implements net.PushListener {
         if (name.isEmpty()) {
             return;
         }
-        if (name.equals(user.getUsername())) {
-            JOptionPane.showMessageDialog(this, "You can't message yourself :)");
-            return;
-        }
         try {
-            api.findUser(name);
+            api.sendFriendRequest(user.getUsername(), name);
+            JOptionPane.showMessageDialog(this, "Friend request sent to " + name + ".");
+            refreshLeft();
         } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, "No user called '" + name + "'.");
-            return;
+            JOptionPane.showMessageDialog(this, ex.getMessage());
         }
-        selectedPartner = name;
-        refreshPartners();
-        showConversation();
+    }
+
+    /*
+     * Live updates from the server. A new message from the friend we're looking
+     * at reloads the chat; a friend request or an accepted request refreshes the
+     * left column so it shows up on its own.
+     */
+    public void onPush(String event, String dataJson) {
+        if (event.equals("newMessage")) {
+            Message m = protocol.Json.fromJson(dataJson, Message.class);
+            if (selectedPartner != null && m.getSender().equals(selectedPartner)) {
+                showConversation();
+            }
+        } else if (event.equals("friendRequest") || event.equals("friendAccepted")) {
+            refreshLeft();
+        }
     }
 
     private String safe(String s) {
