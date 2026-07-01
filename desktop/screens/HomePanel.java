@@ -17,6 +17,7 @@ import javax.swing.ScrollPaneConstants;
 import model.Community;
 import model.User;
 import net.Api;
+import ui.BackgroundTask;
 import ui.RoundedPanel;
 import ui.Theme;
 import ui.UiHelper;
@@ -31,6 +32,7 @@ public class HomePanel extends JPanel implements CommunityCard.Listener {
     private MainWindow main;
     private User user;
     private Api api = Api.get();
+    private JPanel bodyHolder;
 
     public HomePanel(MainWindow main, User user) {
         this.main = main;
@@ -42,13 +44,37 @@ public class HomePanel extends JPanel implements CommunityCard.Listener {
 
         add(buildTopBar(), BorderLayout.NORTH);
 
-        JScrollPane scroll = new JScrollPane(buildBody());
+        // show the frame right away with a gentle loading line, then fetch the
+        // matches in the background so the window never freezes
+        bodyHolder = new JPanel(new BorderLayout());
+        bodyHolder.setOpaque(false);
+        JLabel loading = UiHelper.muted("Finding your communities…", 14);
+        loading.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        bodyHolder.add(loading, BorderLayout.NORTH);
+
+        JScrollPane scroll = new JScrollPane(bodyHolder);
         scroll.setBorder(null);
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(false);
         scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.getVerticalScrollBar().setUnitIncrement(16);
         add(scroll, BorderLayout.CENTER);
+
+        loadMatches();
+    }
+
+    private void loadMatches() {
+        new BackgroundTask<ArrayList<Community>>() {
+            protected ArrayList<Community> work() {
+                return api.homeMatches(user.getUsername());
+            }
+            protected void done(ArrayList<Community> top) {
+                bodyHolder.removeAll();
+                bodyHolder.add(buildBody(top), BorderLayout.CENTER);
+                bodyHolder.revalidate();
+                bodyHolder.repaint();
+            }
+        }.start();
     }
 
     private JPanel buildTopBar() {
@@ -70,14 +96,10 @@ public class HomePanel extends JPanel implements CommunityCard.Listener {
         return bar;
     }
 
-    private JPanel buildBody() {
+    private JPanel buildBody(ArrayList<Community> top) {
         JPanel body = new JPanel();
         body.setOpaque(false);
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
-
-        // the server does the matching and hands back the best communities the
-        // user hasnt joined yet, with the match percent already worked out
-        ArrayList<Community> top = api.homeMatches(user.getUsername());
 
         body.add(buildHero(countGoodMatches(top)));
         body.add(UiHelper.vgap(20));

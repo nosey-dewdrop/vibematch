@@ -20,6 +20,7 @@ import javax.swing.ScrollPaneConstants;
 import model.Community;
 import model.User;
 import net.Api;
+import ui.BackgroundTask;
 import ui.RoundedButton;
 import ui.Theme;
 import ui.UiHelper;
@@ -59,7 +60,51 @@ public class DiscoverPanel extends JPanel implements CommunityCard.Listener {
         scroll.getVerticalScrollBar().setUnitIncrement(16);
         add(scroll, BorderLayout.CENTER);
 
-        showCommunities(api.listCommunities(user.getUsername()));
+        loadAll();
+    }
+
+    // load everything in the background so opening discover doesnt freeze
+    private void loadAll() {
+        showLoading();
+        new BackgroundTask<ArrayList<Community>>() {
+            protected ArrayList<Community> work() {
+                return api.listCommunities(user.getUsername());
+            }
+            protected void done(ArrayList<Community> list) {
+                showCommunities(list);
+            }
+        }.start();
+    }
+
+    private void loadCategory(final String category) {
+        showLoading();
+        new BackgroundTask<ArrayList<Community>>() {
+            protected ArrayList<Community> work() {
+                return api.byCategory(user.getUsername(), category);
+            }
+            protected void done(ArrayList<Community> list) {
+                showCommunities(list);
+            }
+        }.start();
+    }
+
+    private void loadSearch(final String text) {
+        showLoading();
+        new BackgroundTask<ArrayList<Community>>() {
+            protected ArrayList<Community> work() {
+                return api.search(user.getUsername(), text);
+            }
+            protected void done(ArrayList<Community> list) {
+                showCommunities(list);
+            }
+        }.start();
+    }
+
+    private void showLoading() {
+        gridHolder.removeAll();
+        gridHolder.add(UiHelper.muted("Loading…", 14), BorderLayout.NORTH);
+        gridHolder.revalidate();
+        gridHolder.repaint();
     }
 
     private JPanel buildHeader() {
@@ -119,9 +164,9 @@ public class DiscoverPanel extends JPanel implements CommunityCard.Listener {
 
     private void refilter() {
         if (activeCategory.equals("All")) {
-            showCommunities(api.listCommunities(user.getUsername()));
+            loadAll();
         } else {
-            showCommunities(api.byCategory(user.getUsername(), activeCategory));
+            loadCategory(activeCategory);
         }
         // rebuild header so the active category button updates its color
         removeAll();
@@ -143,9 +188,9 @@ public class DiscoverPanel extends JPanel implements CommunityCard.Listener {
         String text = searchField.getText().trim();
         activeCategory = "All";
         if (text.isEmpty()) {
-            showCommunities(api.listCommunities(user.getUsername()));
+            loadAll();
         } else {
-            showCommunities(api.search(user.getUsername(), text));
+            loadSearch(text);
         }
     }
 
@@ -176,6 +221,7 @@ public class DiscoverPanel extends JPanel implements CommunityCard.Listener {
 
     public void join(Community c) {
         api.join(user.getUsername(), c.getId());
+        c.setMember(true);
         refilter();
     }
 }
