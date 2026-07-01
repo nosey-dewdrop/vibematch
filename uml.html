@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vibematch — UML Sınıf Diyagramı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Quicksand:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --lilac-50:#f6f2fd;--lilac-100:#efe8fb;--lilac-200:#e2d5f6;--lilac-300:#cfb9ee;
+  --lilac-400:#b8a4e3;--lilac-500:#9c82d6;--lilac-600:#8b6fc7;--lilac-700:#6f55a8;
+  --ink:#3a3050;--ink-soft:#6b6280;--white:#fff;
+  --blush:#ffd6e0;--peach:#ffe2cf;--mint:#d6f0e4;--butter:#fdf2c9;--sky:#d7e8fb;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Quicksand',sans-serif;color:var(--ink);
+  background:radial-gradient(120% 60% at 0% 0%, #efe8fb 0%, transparent 55%),
+    radial-gradient(120% 60% at 100% 5%, #ffe7f0 0%, transparent 50%),#f6f2fd;
+  padding:44px 22px 80px;-webkit-font-smoothing:antialiased;}
+.head{max-width:1320px;margin:0 auto 18px;text-align:center}
+.head h1{font-family:'Fraunces';font-weight:600;font-size:40px;letter-spacing:-1px}
+.head h1 em{font-style:italic;color:var(--lilac-600)}
+.head p{margin-top:9px;color:var(--ink-soft);font-weight:500;font-size:15px}
+.head p b{color:var(--lilac-700)}
+.legend{max-width:1320px;margin:14px auto 24px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:12.5px;font-weight:600;color:var(--ink-soft)}
+.legend span{background:#fff;padding:6px 12px;border-radius:100px;box-shadow:0 6px 16px -12px var(--lilac-500)}
+
+.stack{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:0}
+.between{display:flex;justify-content:center;align-items:center;height:36px;color:var(--lilac-500);font-weight:700;font-size:13px;gap:8px}
+.between .line{font-family:'JetBrains Mono';font-size:20px}
+
+.pkg{border-radius:22px;padding:15px 16px 17px;box-shadow:0 18px 40px -24px rgba(108,80,168,.5);border:1.5px solid rgba(255,255,255,.7)}
+.pkg-head{display:flex;align-items:baseline;gap:11px;margin-bottom:12px}
+.pkg-head .no{font-family:'Fraunces';font-weight:600;font-size:15px;color:#fff;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;flex:none}
+.pkg-head h2{font-family:'Fraunces';font-weight:600;font-size:19px}
+.pkg-head code{font-family:'JetBrains Mono';font-size:12px;background:rgba(255,255,255,.6);padding:2px 8px;border-radius:6px;color:var(--lilac-700)}
+.pkg-head .role{margin-left:auto;font-size:13px;font-weight:600;color:var(--ink-soft)}
+.cards{display:flex;gap:11px;flex-wrap:wrap;align-items:flex-start}
+
+.cls{background:#fff;border-radius:11px;width:236px;overflow:hidden;box-shadow:0 8px 20px -14px rgba(108,80,168,.5);border:1px solid var(--lilac-100)}
+.cls .name{font-family:'Fraunces';font-weight:600;font-size:13.5px;padding:7px 11px;text-align:center;border-bottom:1px solid var(--lilac-200);color:var(--ink)}
+.cls .name small{font-family:'JetBrains Mono';font-weight:400;font-size:9px;color:var(--lilac-500);display:block}
+.cls .attr,.cls .meth{padding:6px 11px;font-family:'JetBrains Mono';font-size:10.5px;line-height:1.62;color:var(--ink-soft)}
+.cls .meth{border-top:1px solid var(--lilac-100)}
+.cls .attr span{color:#8a6fb0}
+.cls .meth span{color:var(--lilac-700)}
+.cls .cmt{color:var(--lilac-400)}
+
+.t-model{background:linear-gradient(135deg,#fff,var(--blush) 320%)}
+.t-data{background:linear-gradient(135deg,#fff,var(--sky) 300%)}
+.t-service{background:linear-gradient(135deg,#fff,var(--mint) 300%)}
+.t-net{background:linear-gradient(135deg,#fff,var(--butter) 320%)}
+.t-server{background:linear-gradient(135deg,#fff,var(--peach) 300%)}
+.t-ui{background:linear-gradient(135deg,#fff,var(--lilac-100) 200%)}
+.c-model{background:#e0788b}.c-data{background:#6f8fd6}.c-service{background:#5cc09a}
+.c-net{background:#c9a227}.c-server{background:#f59e8b}.c-ui{background:var(--lilac-600)}
+.foundation{border:2px dashed var(--lilac-400)}
+.foundation .pkg-head h2:after{content:" · TEMEL";font-family:'JetBrains Mono';font-size:12px;color:var(--lilac-500)}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>vibematch — <em>UML</em> Sınıf Diyagramı</h1>
+  <p>Her kutu: <b>ad</b> / <b>alanlar (−private)</b> / <b>metotlar (+public)</b>. En üstteki (1) temel; her kat üstündekine bağlı (▲).</p>
+</div>
+<div class="legend">
+  <span>− private alan</span><span>+ public metot</span><span>▲ depends on</span><span>◇→ has-a (kendine referans)</span>
+</div>
+
+<div class="stack">
+
+  <!-- 1 MODEL -->
+  <div class="pkg t-model foundation">
+    <div class="pkg-head"><span class="no c-model">1</span><h2>Veri</h2><code>model</code><span class="role">sadece veri · her şeyin temeli</span></div>
+    <div class="cards">
+      <div class="cls"><div class="name">User</div>
+        <div class="attr"><span>-</span>username, displayName, email<br><span>-</span>passHash, salt, bio<br><span>-</span>verified, mbtiType, interests[]</div>
+        <div class="meth"><span>+</span>hasVibe(): boolean</div></div>
+      <div class="cls"><div class="name">Community</div>
+        <div class="attr"><span>-</span>id, name, description<br><span>-</span>category, emoji, tags[]<br><span>-</span>memberCount, matchPercent, member</div>
+        <div class="meth"><span>+</span>get/set... </div></div>
+      <div class="cls"><div class="name">Post</div>
+        <div class="attr"><span>-</span>id, communityId<br><span>-</span>author, title, body<br><span>-</span>commentCount</div>
+        <div class="meth"><span>+</span>get/set...</div></div>
+      <div class="cls"><div class="name">Comment</div>
+        <div class="attr"><span>-</span>id, postId, author<br><span>-</span>body, <b>parentId</b> ◇→ self<br><span class="cmt">// 0=üst, &gt;0=cevap</span></div>
+        <div class="meth"><span>+</span>isTopLevel(): boolean</div></div>
+      <div class="cls"><div class="name">Message</div>
+        <div class="attr"><span>-</span>id, sender, receiver<br><span>-</span>body, createdAt, read</div>
+        <div class="meth"><span>+</span>get/set...</div></div>
+      <div class="cls"><div class="name">MbtiResult</div>
+        <div class="attr"><span>-</span>type <span class="cmt">(INFP)</span><br><span>-</span>eiPercent, snPercent<br><span>-</span>tfPercent, jpPercent</div>
+        <div class="meth"><span>+</span>getType(), get..Percent()</div></div>
+      <div class="cls"><div class="name">Notification</div>
+        <div class="attr"><span>-</span>id, username, type<br><span>-</span>text, createdAt, read</div>
+        <div class="meth"><span>+</span>get/set...</div></div>
+      <div class="cls"><div class="name">Interests / Categories<small>&lt;&lt;static&gt;&gt;</small></div>
+        <div class="attr"><span>-</span>ALL[] <span class="cmt">// ilgi, kategori listeleri</span></div>
+        <div class="meth"><span>+</span>emojiFor(name): String</div></div>
+    </div>
+  </div>
+
+  <div class="between"><span class="line">▲</span> DAO'lar model'i kullanır</div>
+
+  <!-- 2 DATA -->
+  <div class="pkg t-data">
+    <div class="pkg-head"><span class="no c-data">2</span><h2>Erişim &amp; Depolama</h2><code>data</code><span class="role">SQL sadece burada</span></div>
+    <div class="cards">
+      <div class="cls"><div class="name">Db<small>&lt;&lt;SQLite&gt;&gt;</small></div>
+        <div class="attr"><span>-</span>connection</div>
+        <div class="meth"><span>+</span>connect() <span>+</span>getConnection()<br><span>+</span>close() <span class="cmt">// tabloları kurar</span></div></div>
+      <div class="cls"><div class="name">UserDao</div>
+        <div class="meth"><span>+</span>insert(u) <span>+</span>findByUsername()<br><span>+</span>findByEmail() <span>+</span>emailExists()<br><span>+</span>setVerified() <span>+</span>updateMbti()<br><span>+</span>get/setInterests()</div></div>
+      <div class="cls"><div class="name">CommunityDao</div>
+        <div class="meth"><span>+</span>insert() <span>+</span>addTag() <span>+</span>getTags()<br><span>+</span>getAll() <span>+</span>getByCategory()<br><span>+</span>search() <span>+</span>join() <span>+</span>leave()<br><span>+</span>isMember() <span>+</span>getJoined()<br><span>+</span>memberCount() <span>+</span>getMemberUsernames()</div></div>
+      <div class="cls"><div class="name">PostDao</div>
+        <div class="meth"><span>+</span>insertPost() <span>+</span>findPost()<br><span>+</span>getPostsForCommunity()<br><span>+</span>insertComment() <span>+</span>getComments()<br><span>+</span>commentCount()</div></div>
+      <div class="cls"><div class="name">MessageDao</div>
+        <div class="meth"><span>+</span>send(m)<br><span>+</span>getConversation(a,b)<br><span>+</span>getPartners(user)</div></div>
+      <div class="cls"><div class="name">FriendDao</div>
+        <div class="meth"><span>+</span>request() <span>+</span>accept() <span>+</span>decline()<br><span>+</span>areFriends() <span>+</span>relationFor()<br><span>+</span>getFriends()<br><span>+</span>getIncomingRequests()</div></div>
+      <div class="cls"><div class="name">NotificationDao</div>
+        <div class="meth"><span>+</span>insert()<br><span>+</span>forUser()<br><span>+</span>unreadCount()<br><span>+</span>markAllRead()</div></div>
+      <div class="cls"><div class="name">SampleData<small>&lt;&lt;seed&gt;&gt;</small></div>
+        <div class="meth"><span>+</span>seedIfNeeded()<br><span class="cmt">// ilk açılışta örnek veri</span></div></div>
+    </div>
+  </div>
+
+  <div class="between"><span class="line">▲</span> servisler DAO'ları çağırır</div>
+
+  <!-- 3 SERVICE -->
+  <div class="pkg t-service">
+    <div class="pkg-head"><span class="no c-service">3</span><h2>Kurallar</h2><code>service</code><span class="role">iş mantığı</span></div>
+    <div class="cards">
+      <div class="cls"><div class="name">AuthService</div>
+        <div class="meth"><span>+</span>register(name,user,mail,pass)<br><span>+</span>login(userOrMail,pass)<br><span>+</span>markVerified()<br><span>+</span>generateVerificationCode()</div></div>
+      <div class="cls"><div class="name">MatchService</div>
+        <div class="meth"><span>+</span>scoreFor(user,comm): int<br><span>+</span>topMatches(user,list,n)<br><span>+</span>reason(user,comm)<br><span class="cmt">// ilgi %65 + mbti %35</span></div></div>
+      <div class="cls"><div class="name">MbtiService</div>
+        <div class="meth"><span>+</span>getQuestions()<br><span>+</span>score(answers[]): MbtiResult<br><span>+</span>archetypeName/Emoji/Blurb()</div></div>
+      <div class="cls"><div class="name">CommunityService</div>
+        <div class="meth"><span>+</span>getAll() <span>+</span>findById()<br><span>+</span>getByCategory() <span>+</span>search()<br><span>+</span>getJoined() <span>+</span>isMember()<br><span>+</span>join() <span>+</span>leave()</div></div>
+    </div>
+  </div>
+
+  <div class="between"><span class="line">▲</span> handler'lar servisleri çağırır</div>
+
+  <!-- 4 SERVER -->
+  <div class="pkg t-server">
+    <div class="pkg-head"><span class="no c-server">4</span><h2>Sunucu</h2><code>server</code><span class="role">ağ + eşzamanlılık (soket)</span></div>
+    <div class="cards">
+      <div class="cls"><div class="name">ChatServer</div>
+        <div class="attr"><span>-</span>online{ user → handler }</div>
+        <div class="meth"><span>+</span>start() <span class="cmt">// accept loop</span><br><span>+</span>register() <span>+</span>unregister()<br><span>+</span>pushTo() <span>+</span>pushToMany()</div></div>
+      <div class="cls"><div class="name">ClientHandler<small>implements Runnable</small></div>
+        <div class="attr"><span>-</span>socket, in, out, username</div>
+        <div class="meth"><span>+</span>run() <span class="cmt">// oku→yönlendir→yaz</span><br><span>+</span>send(response)</div></div>
+      <div class="cls"><div class="name">RequestRouter</div>
+        <div class="meth"><span>+</span>handle(req, client)<br><span class="cmt">// action → doğru handler</span></div></div>
+      <div class="cls"><div class="name">AuthHandler</div>
+        <div class="meth"><span>+</span>register() <span>+</span>verify()<br><span>+</span>resend() <span>+</span>login()</div></div>
+      <div class="cls"><div class="name">ProfileHandler</div>
+        <div class="meth"><span>+</span>setInterests()<br><span>+</span>submitMbti() <span>+</span>getUser()</div></div>
+      <div class="cls"><div class="name">CommunityHandler</div>
+        <div class="meth"><span>+</span>list() <span>+</span>get() <span>+</span>search()<br><span>+</span>byCategory() <span>+</span>joined()<br><span>+</span>join() <span>+</span>leave()<br><span>+</span>homeMatches() <span>+</span>scoreOne()</div></div>
+      <div class="cls"><div class="name">ForumHandler</div>
+        <div class="meth"><span>+</span>posts() <span>+</span>createPost()<br><span>+</span>comments() <span>+</span>addComment()<br><span class="cmt">// +push forumUpdate</span></div></div>
+      <div class="cls"><div class="name">MessageHandler</div>
+        <div class="meth"><span>+</span>partners() <span>+</span>conversation()<br><span>+</span>send() <span class="cmt">// arkadaş kontrolü + push</span><br><span>+</span>findUser()</div></div>
+      <div class="cls"><div class="name">FriendHandler</div>
+        <div class="meth"><span>+</span>sendRequest() <span>+</span>respond()<br><span>+</span>friends() <span>+</span>requests()<br><span>+</span>status()</div></div>
+      <div class="cls"><div class="name">NotificationHandler</div>
+        <div class="meth"><span>+</span>list() <span>+</span>unread()<br><span>+</span>markRead()</div></div>
+      <div class="cls"><div class="name">Notifier / Dto<small>&lt;&lt;helper&gt;&gt;</small></div>
+        <div class="meth"><span>+</span>notify(server,user,type,text)<br><span>+</span>safeUser() <span class="cmt">// şifreyi gizler</span></div></div>
+    </div>
+  </div>
+
+  <div class="between"><span class="line">▲</span> istemci sokete bağlanır (JSON: istek/cevap + push)</div>
+
+  <!-- 5 NET -->
+  <div class="pkg t-net">
+    <div class="pkg-head"><span class="no c-net">5</span><h2>İstemci Köprüsü</h2><code>net · protocol</code><span class="role">sunucuya bağlanır</span></div>
+    <div class="cards">
+      <div class="cls"><div class="name">Api<small>&lt;&lt;facade&gt;&gt;</small></div>
+        <div class="meth"><span>+</span>login() <span>+</span>register() <span>+</span>verify()<br><span>+</span>homeMatches() <span>+</span>listCommunities()<br><span>+</span>posts() <span>+</span>createPost() <span>+</span>addComment()<br><span>+</span>conversation() <span>+</span>sendMessage()<br><span>+</span>sendFriendRequest() <span>+</span>respondToRequest()<br><span>+</span>notifications() <span>+</span>unreadCount()</div></div>
+      <div class="cls"><div class="name">ServerClient<small>&lt;&lt;singleton&gt;&gt;</small></div>
+        <div class="attr"><span>-</span>socket, pending{}, listeners[]</div>
+        <div class="meth"><span>+</span>connect(host,port)<br><span>+</span>send(action,data): String<br><span>+</span>add/removePushListener()</div></div>
+      <div class="cls"><div class="name">Request · Response<small>protocol</small></div>
+        <div class="attr"><span>-</span>Req: id, action, data<br><span>-</span>Res: type, ok, error, event, data</div>
+        <div class="meth"><span>+</span>reply() <span>+</span>fail() <span>+</span>push()</div></div>
+      <div class="cls"><div class="name">Json · Params<small>protocol</small></div>
+        <div class="meth"><span>+</span>toJson() <span>+</span>fromJson()<br><span>+</span>parse() <span>+</span>of() <span>+</span>put()</div></div>
+      <div class="cls"><div class="name">PushListener<small>&lt;&lt;interface&gt;&gt;</small></div>
+        <div class="meth"><span>+</span>onPush(event, dataJson)</div></div>
+    </div>
+  </div>
+
+  <div class="between"><span class="line">▲</span> ekranlar Api'yi çağırır (SQL/kural bilmez)</div>
+
+  <!-- 6 UI / SCREENS -->
+  <div class="pkg t-ui">
+    <div class="pkg-head"><span class="no c-ui">6</span><h2>Arayüz</h2><code>ui / screens</code><span class="role">kullanıcının gördüğü (JPanel)</span></div>
+    <div class="cards">
+      <div class="cls"><div class="name">MainWindow<small>koordinatör · PushListener</small></div>
+        <div class="meth"><span>+</span>navigate(key)<br><span>+</span>showHome/Discover/Messages...()<br><span>+</span>openCommunity() <span>+</span>openPost()<br><span>+</span>onPush() <span class="cmt">// aktif ekrana ilet</span></div></div>
+      <div class="cls"><div class="name">MbtiTestPanel</div>
+        <div class="meth"><span>-</span>render() <span>-</span>answer(choice)<br><span>-</span>finish() <span class="cmt">// api.submitMbti</span></div></div>
+      <div class="cls"><div class="name">HomePanel · DiscoverPanel</div>
+        <div class="meth"><span>-</span>loadMatches() / loadAll()<br><span class="cmt">// BackgroundTask ile arka planda</span></div></div>
+      <div class="cls"><div class="name">CommunityDetailPanel<small>PushListener</small></div>
+        <div class="meth"><span>-</span>buildPostList()<br><span>+</span>onPush() <span class="cmt">// forumUpdate → tazele</span></div></div>
+      <div class="cls"><div class="name">PostDetailPanel<small>PushListener</small></div>
+        <div class="meth"><span>-</span>buildCommentTree() <span class="cmt">// threading</span><br><span>+</span>onPush()</div></div>
+      <div class="cls"><div class="name">MessagesPanel<small>PushListener</small></div>
+        <div class="meth"><span>-</span>refreshLeft() <span>-</span>sendMessage()<br><span>-</span>addFriend()<br><span>+</span>onPush() <span class="cmt">// newMessage</span></div></div>
+      <div class="cls"><div class="name">NotificationsPanel · ProfilePanel</div>
+        <div class="meth"><span>-</span>load() / buildCard()</div></div>
+      <div class="cls"><div class="name">Login · Register · Verify</div>
+        <div class="meth"><span>-</span>doLogin() / doRegister() / doVerify()</div></div>
+      <div class="cls"><div class="name">ui: Theme · RoundedButton<br>CommunityCard · Chip · BackgroundTask<small>ortak parçalar</small></div>
+        <div class="meth"><span>+</span>heading()/body() <span>+</span>start()<br><span class="cmt">// renk, font, buton, arka plan iş</span></div></div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
