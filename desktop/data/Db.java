@@ -159,6 +159,19 @@ public class Db {
             ")"
         );
 
+        // notifications shown on the bell
+        st.execute(
+            "CREATE TABLE IF NOT EXISTS notifications (" +
+            "  id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "  username TEXT NOT NULL," +
+            "  type TEXT NOT NULL," +
+            "  text TEXT NOT NULL," +
+            "  created_at TEXT NOT NULL," +
+            "  is_read INTEGER NOT NULL DEFAULT 0," +
+            "  FOREIGN KEY (username) REFERENCES users(username)" +
+            ")"
+        );
+
         // 1 on 1 direct messages
         st.execute(
             "CREATE TABLE IF NOT EXISTS messages (" +

@@ -53,11 +53,13 @@ public class FriendHandler {
             // they already asked us, so just accept instead of a second request
             friendDao.accept(to, from);
             pushTo(to, "friendAccepted", from);
+            Notifier.notify(server, to, "friend_accepted", from + " accepted your friend request");
             return Response.reply(req.id, "{\"accepted\":true}");
         }
 
         friendDao.request(from, to);
         pushTo(to, "friendRequest", from);
+        Notifier.notify(server, to, "friend_request", from + " sent you a friend request");
         return Response.reply(req.id, "{\"sent\":true}");
     }
 
@@ -69,6 +71,7 @@ public class FriendHandler {
         if (accept) {
             friendDao.accept(requester, me);
             pushTo(requester, "friendAccepted", me);
+            Notifier.notify(server, requester, "friend_accepted", me + " accepted your friend request");
         } else {
             friendDao.decline(requester, me);
         }

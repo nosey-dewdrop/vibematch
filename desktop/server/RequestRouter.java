@@ -23,6 +23,7 @@ public class RequestRouter {
     private ForumHandler forumHandler;
     private MessageHandler messageHandler;
     private FriendHandler friendHandler;
+    private NotificationHandler notificationHandler = new NotificationHandler();
 
     public RequestRouter(ChatServer server) {
         this.server = server;
@@ -130,6 +131,17 @@ public class RequestRouter {
         }
         if (action.equals("friends.status")) {
             return friendHandler.status(request);
+        }
+
+        // notifications
+        if (action.equals("notifications.list")) {
+            return notificationHandler.list(request);
+        }
+        if (action.equals("notifications.unread")) {
+            return notificationHandler.unread(request);
+        }
+        if (action.equals("notifications.markRead")) {
+            return notificationHandler.markRead(request);
         }
 
         // messages

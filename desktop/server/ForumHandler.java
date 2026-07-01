@@ -72,6 +72,12 @@ public class ForumHandler {
         Post post = postDao.findPost(postId);
         if (post != null) {
             pushForumUpdate(post.getCommunityId());
+            // tell the post's author someone replied (unless they did it themself)
+            String author = req.getString("author");
+            if (post.getAuthor() != null && !post.getAuthor().equals(author)) {
+                Notifier.notify(server, post.getAuthor(),
+                        "reply", author + " commented on your post \"" + post.getTitle() + "\"");
+            }
         }
         return Response.reply(req.id, Json.toJson(c));
     }

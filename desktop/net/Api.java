@@ -175,6 +175,27 @@ public class Api {
                 .put("body", body).put("parentId", parentId).json());
     }
 
+    // ---- notifications ----
+
+    public ArrayList<model.Notification> notifications(String username) {
+        String data = client.send("notifications.list", Params.of().put("username", username).json());
+        model.Notification[] arr = Json.fromJson(data, model.Notification[].class);
+        ArrayList<model.Notification> list = new ArrayList<model.Notification>();
+        for (int i = 0; i < arr.length; i++) {
+            list.add(arr[i]);
+        }
+        return list;
+    }
+
+    public int unreadCount(String username) {
+        String data = client.send("notifications.unread", Params.of().put("username", username).json());
+        return Json.parse(data).get("count").getAsInt();
+    }
+
+    public void markNotificationsRead(String username) {
+        client.send("notifications.markRead", Params.of().put("username", username).json());
+    }
+
     // ---- friends ----
 
     // send a friend request. throws with the reason if it can't be sent.

@@ -62,6 +62,9 @@ public class MessageHandler {
         Response push = Response.push("newMessage", Json.toJson(m));
         server.pushTo(receiver, push);
 
+        // and drop a notification on their bell
+        Notifier.notify(server, receiver, "message", sender + " sent you a message");
+
         return Response.reply(req.id, Json.toJson(m));
     }
 
