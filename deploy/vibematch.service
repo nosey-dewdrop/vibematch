@@ -1,0 +1,21 @@
+[Unit]
+# keeps the vibematch server running 24/7 on the cloud machine, even after a
+# crash or a reboot. installed by deploy/setup.sh
+Description=vibematch server
+After=network.target
+
+[Service]
+Type=simple
+User=vibematch
+WorkingDirectory=/opt/vibematch
+# smtp password comes from the environment, never from a file on disk.
+# fill these in on the server with: sudo systemctl edit vibematch
+# (add the two Environment= lines under a [Service] block), then restart.
+# Environment=VIBEMATCH_EMAIL_SENDER=you@gmail.com
+# Environment=VIBEMATCH_EMAIL_PASSWORD=your_app_password
+ExecStart=/usr/bin/java -cp "build:desktop/lib/*" server.ServerMain
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
