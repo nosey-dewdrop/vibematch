@@ -34,6 +34,7 @@ public class MainWindow extends JPanel implements PushListener {
 
     private JPanel content;
     private JComponent currentPanel;
+    private NavButton bellNav;
     private ArrayList<NavButton> navButtons = new ArrayList<NavButton>();
 
     public MainWindow(AppFrame appFrame, User user) {
@@ -57,8 +58,12 @@ public class MainWindow extends JPanel implements PushListener {
         showHome();
     }
 
-    // a push arrived from the server. hand it to the open screen if it wants it.
+    // a push arrived from the server. bump the bell if it's a notification, and
+    // hand it to the open screen if that screen cares.
     public void onPush(String event, String dataJson) {
+        if (event.equals("notification")) {
+            updateBell();
+        }
         if (currentPanel instanceof PushListener) {
             ((PushListener) currentPanel).onPush(event, dataJson);
         }
@@ -97,7 +102,9 @@ public class MainWindow extends JPanel implements PushListener {
         addNav(side, "discover", "🔍", "Discover");
         addNav(side, "communities", "💜", "My Communities");
         addNav(side, "messages", "✉️", "Messages");
+        bellNav = addNav(side, "notifications", "🔔", "Notifications");
         addNav(side, "profile", "🙂", "Profile");
+        updateBell();
 
         side.add(javax.swing.Box.createVerticalGlue());
         side.add(buildUserChip());
@@ -105,7 +112,7 @@ public class MainWindow extends JPanel implements PushListener {
         return side;
     }
 
-    private void addNav(JPanel side, final String key, String icon, String text) {
+    private NavButton addNav(JPanel side, final String key, String icon, String text) {
         NavButton nav = new NavButton(key, icon, text);
         nav.setAlignmentX(LEFT_ALIGNMENT);
         nav.addMouseListener(new MouseAdapter() {
@@ -116,6 +123,21 @@ public class MainWindow extends JPanel implements PushListener {
         navButtons.add(nav);
         side.add(nav);
         side.add(UiHelper.vgap(4));
+        return nav;
+    }
+
+    // refresh the little unread count on the bell, in the background
+    private void updateBell() {
+        new ui.BackgroundTask<Integer>() {
+            protected Integer work() {
+                return Integer.valueOf(net.Api.get().unreadCount(user.getUsername()));
+            }
+            protected void done(Integer count) {
+                if (bellNav != null) {
+                    bellNav.setBadge(count.intValue());
+                }
+            }
+        }.start();
     }
 
     private JPanel buildUserChip() {
@@ -154,6 +176,8 @@ public class MainWindow extends JPanel implements PushListener {
             showMyCommunities();
         } else if (key.equals("messages")) {
             showMessages();
+        } else if (key.equals("notifications")) {
+            showNotifications();
         } else if (key.equals("profile")) {
             showProfile();
         }
@@ -199,6 +223,16 @@ public class MainWindow extends JPanel implements PushListener {
         setContent(new ProfilePanel(this, user));
     }
 
+    public void showNotifications() {
+        setActive("notifications");
+        setContent(new NotificationsPanel(this, user));
+        // opening the list clears the unread ones
+        net.Api.get().markNotificationsRead(user.getUsername());
+        if (bellNav != null) {
+            bellNav.setBadge(0);
+        }
+    }
+
     public void showSettings() {
         setActive("profile");
         setContent(new SettingsPanel(this, user));
@@ -223,22 +257,46 @@ public class MainWindow extends JPanel implements PushListener {
         private String key;
         private boolean active = false;
         private JLabel label;
+        private JLabel badge;   // little unread count, hidden when zero
+        private String baseText;
 
         NavButton(String key, String icon, String text) {
             this.key = key;
+            this.baseText = icon + "   " + text;
             setOpaque(false);
             setLayout(new BorderLayout());
             setMaximumSize(new Dimension(200, 42));
             setBorder(BorderFactory.createEmptyBorder(2, 12, 2, 12));
             setCursor(new Cursor(Cursor.HAND_CURSOR));
-            label = new JLabel(icon + "   " + text);
+            label = new JLabel(baseText);
             label.setFont(Theme.bodyBold(14));
             label.setForeground(Theme.INK_SOFT);
             add(label, BorderLayout.CENTER);
+
+            badge = new JLabel("");
+            badge.setFont(Theme.bodyBold(11));
+            badge.setForeground(Color.WHITE);
+            badge.setOpaque(true);
+            badge.setBackground(new Color(0xE0, 0x7A, 0x8B));
+            badge.setBorder(BorderFactory.createEmptyBorder(1, 7, 1, 7));
+            badge.setVisible(false);
+            add(badge, BorderLayout.EAST);
         }
 
         String getKey() {
             return key;
+        }
+
+        // show a red count on the right (used by the bell). 0 hides it.
+        void setBadge(int count) {
+            if (count > 0) {
+                badge.setText(count > 9 ? "9+" : ("" + count));
+                badge.setVisible(true);
+            } else {
+                badge.setVisible(false);
+            }
+            revalidate();
+            repaint();
         }
 
         void setActive(boolean a) {
