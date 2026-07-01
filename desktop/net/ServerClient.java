@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.SwingUtilities;
 
@@ -40,7 +41,7 @@ public class ServerClient {
     private PrintWriter out;
     private boolean connected = false;
 
-    private int nextId = 1;
+    private AtomicInteger nextId = new AtomicInteger(1);
 
     // requests we are still waiting on, by id
     private HashMap<Integer, Holder> pending = new HashMap<Integer, Holder>();
@@ -136,12 +137,8 @@ public class ServerClient {
             throw new IllegalArgumentException("Not connected to the server.");
         }
 
-        int id;
         Holder holder = new Holder();
-        synchronized (this) {
-            id = nextId;
-            nextId++;
-        }
+        int id = nextId.getAndIncrement();
         synchronized (pending) {
             pending.put(id, holder);
         }
