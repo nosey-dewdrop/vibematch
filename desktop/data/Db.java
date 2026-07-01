@@ -145,6 +145,20 @@ public class Db {
             ")"
         );
 
+        // friendships. one row per request: requester = user_a, target = user_b.
+        // status is 'pending' until the target accepts, then 'accepted'.
+        st.execute(
+            "CREATE TABLE IF NOT EXISTS friendships (" +
+            "  user_a TEXT NOT NULL," +
+            "  user_b TEXT NOT NULL," +
+            "  status TEXT NOT NULL," +
+            "  created_at TEXT NOT NULL," +
+            "  PRIMARY KEY (user_a, user_b)," +
+            "  FOREIGN KEY (user_a) REFERENCES users(username)," +
+            "  FOREIGN KEY (user_b) REFERENCES users(username)" +
+            ")"
+        );
+
         // 1 on 1 direct messages
         st.execute(
             "CREATE TABLE IF NOT EXISTS messages (" +

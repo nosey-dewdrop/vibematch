@@ -22,11 +22,13 @@ public class RequestRouter {
     private CommunityHandler communityHandler = new CommunityHandler();
     private ForumHandler forumHandler;
     private MessageHandler messageHandler;
+    private FriendHandler friendHandler;
 
     public RequestRouter(ChatServer server) {
         this.server = server;
         this.forumHandler = new ForumHandler(server);
         this.messageHandler = new MessageHandler(server);
+        this.friendHandler = new FriendHandler(server);
     }
 
     public Response handle(Request request, ClientHandler client) {
@@ -111,6 +113,23 @@ public class RequestRouter {
         }
         if (action.equals("forum.addComment")) {
             return forumHandler.addComment(request);
+        }
+
+        // friends
+        if (action.equals("friends.request")) {
+            return friendHandler.sendRequest(request);
+        }
+        if (action.equals("friends.respond")) {
+            return friendHandler.respond(request);
+        }
+        if (action.equals("friends.list")) {
+            return friendHandler.friends(request);
+        }
+        if (action.equals("friends.requests")) {
+            return friendHandler.requests(request);
+        }
+        if (action.equals("friends.status")) {
+            return friendHandler.status(request);
         }
 
         // messages

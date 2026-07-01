@@ -175,6 +175,33 @@ public class Api {
                 .put("body", body).put("parentId", parentId).json());
     }
 
+    // ---- friends ----
+
+    // send a friend request. throws with the reason if it can't be sent.
+    public void sendFriendRequest(String from, String to) {
+        client.send("friends.request", Params.of().put("from", from).put("to", to).json());
+    }
+
+    public void respondToRequest(String me, String requester, boolean accept) {
+        client.send("friends.respond", Params.of()
+                .put("me", me).put("requester", requester).put("accept", accept ? 1 : 0).json());
+    }
+
+    public ArrayList<String> friends(String username) {
+        String data = client.send("friends.list", Params.of().put("username", username).json());
+        return stringList(data);
+    }
+
+    public ArrayList<String> friendRequests(String username) {
+        String data = client.send("friends.requests", Params.of().put("username", username).json());
+        return stringList(data);
+    }
+
+    public String friendStatus(String me, String other) {
+        String data = client.send("friends.status", Params.of().put("me", me).put("other", other).json());
+        return Json.parse(data).get("relation").getAsString();
+    }
+
     // ---- messages ----
 
     public ArrayList<String> partners(String username) {
@@ -209,6 +236,15 @@ public class Api {
     }
 
     // ---- helpers ----
+
+    private ArrayList<String> stringList(String data) {
+        String[] arr = Json.fromJson(data, String[].class);
+        ArrayList<String> list = new ArrayList<String>();
+        for (int i = 0; i < arr.length; i++) {
+            list.add(arr[i]);
+        }
+        return list;
+    }
 
     private ArrayList<Community> toList(String data) {
         Community[] arr = Json.fromJson(data, Community[].class);

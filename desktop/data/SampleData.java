@@ -28,6 +28,20 @@ public class SampleData {
         seedUsers();
         seedCommunities();
         seedForum();
+        seedFriends();
+    }
+
+    // a few starter friendships + one pending request so the demo isnt empty
+    private static void seedFriends() {
+        FriendDao friendDao = new FriendDao();
+        friendDao.request("ada", "can");
+        friendDao.accept("ada", "can");
+        friendDao.request("ada", "zeynep");
+        friendDao.accept("ada", "zeynep");
+        friendDao.request("can", "mert");
+        friendDao.accept("can", "mert");
+        // elif sent ada a request that is still waiting
+        friendDao.request("elif", "ada");
     }
 
     private static void seedUsers() {

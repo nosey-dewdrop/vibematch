@@ -1,5 +1,6 @@
 package server;
 
+import data.FriendDao;
 import data.MessageDao;
 import data.UserDao;
 import model.Message;
@@ -19,6 +20,7 @@ public class MessageHandler {
 
     private MessageDao messageDao = new MessageDao();
     private UserDao userDao = new UserDao();
+    private FriendDao friendDao = new FriendDao();
     private ChatServer server;
 
     public MessageHandler(ChatServer server) {
@@ -47,6 +49,11 @@ public class MessageHandler {
         String sender = req.getString("sender");
         String receiver = req.getString("receiver");
         String body = req.getString("body");
+
+        // privacy: you can only message people you are friends with
+        if (!friendDao.areFriends(sender, receiver)) {
+            return Response.fail(req.id, "You can only message your friends.");
+        }
 
         Message m = new Message(sender, receiver, body);
         messageDao.send(m);
