@@ -3,339 +3,235 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>vibematch — Technical Documentation</title>
+<title>vibematch — UML Class Diagram</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Quicksand:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root{ --ink:#1b1b1f; --soft:#555; --rule:#d8d8de; --accent:#2c2740; }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{
-    font-family:Georgia,'Times New Roman',serif;
-    color:var(--ink); background:#e9e9ec; margin:0; line-height:1.62;
-    -webkit-font-smoothing:antialiased;
-  }
-  .page{
-    max-width:760px; margin:32px auto; background:#fff; padding:64px 72px;
-    box-shadow:0 1px 4px rgba(0,0,0,.14); border:1px solid #ddd;
-  }
-  /* cover block */
-  .cover{border-bottom:2px solid var(--ink); padding-bottom:20px; margin-bottom:12px}
-  .cover .kind{font-family:Arial,Helvetica,sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--soft)}
-  .cover h1{font-size:34px;margin:8px 0 4px;font-weight:normal;letter-spacing:-.3px}
-  .cover .meta{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:var(--soft);margin-top:8px}
-  .cover .meta a{color:var(--accent)}
+:root{
+  --lilac-50:#f6f2fd;--lilac-100:#efe8fb;--lilac-200:#e2d5f6;--lilac-300:#cfb9ee;
+  --lilac-400:#b8a4e3;--lilac-500:#9c82d6;--lilac-600:#8b6fc7;--lilac-700:#6f55a8;
+  --ink:#3a3050;--ink-soft:#6b6280;--white:#fff;
+  --blush:#ffd6e0;--peach:#ffe2cf;--mint:#d6f0e4;--butter:#fdf2c9;--sky:#d7e8fb;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Quicksand',sans-serif;color:var(--ink);
+  background:radial-gradient(120% 60% at 0% 0%, #efe8fb 0%, transparent 55%),
+    radial-gradient(120% 60% at 100% 5%, #ffe7f0 0%, transparent 50%),#f6f2fd;
+  padding:44px 22px 80px;-webkit-font-smoothing:antialiased;}
+.head{max-width:1320px;margin:0 auto 18px;text-align:center}
+.head h1{font-family:'Fraunces';font-weight:600;font-size:40px;letter-spacing:-1px}
+.head h1 em{font-style:italic;color:var(--lilac-600)}
+.head p{margin-top:9px;color:var(--ink-soft);font-weight:500;font-size:15px}
+.head p b{color:var(--lilac-700)}
+.legend{max-width:1320px;margin:14px auto 24px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:12.5px;font-weight:600;color:var(--ink-soft)}
+.legend span{background:#fff;padding:6px 12px;border-radius:100px;box-shadow:0 6px 16px -12px var(--lilac-500)}
 
-  h2{font-size:21px;font-weight:normal;margin:34px 0 6px;border-bottom:1px solid var(--rule);padding-bottom:5px}
-  h2 .num{color:var(--soft);font-family:Arial,Helvetica,sans-serif;font-size:15px;margin-right:8px}
-  h3{font-size:16px;margin:20px 0 4px;font-weight:bold}
-  p{margin:9px 0;text-align:justify}
-  ul,ol{margin:9px 0 9px 22px}
-  li{margin:4px 0}
-  strong{font-weight:bold}
-  em{font-style:italic}
-  a{color:var(--accent)}
+.stack{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:0}
+.between{display:flex;justify-content:center;align-items:center;height:36px;color:var(--lilac-500);font-weight:700;font-size:13px;gap:8px}
+.between .line{font-family:'JetBrains Mono';font-size:20px}
 
-  /* table of contents */
-  .toc{font-family:Arial,Helvetica,sans-serif;font-size:13.5px;background:#f6f6f8;border:1px solid var(--rule);padding:14px 18px;margin:18px 0}
-  .toc b{display:block;margin-bottom:6px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--soft)}
-  .toc a{display:block;color:var(--ink);text-decoration:none;padding:2px 0}
-  .toc a:hover{text-decoration:underline}
+.pkg{border-radius:22px;padding:15px 16px 17px;box-shadow:0 18px 40px -24px rgba(108,80,168,.5);border:1.5px solid rgba(255,255,255,.7)}
+.pkg-head{display:flex;align-items:baseline;gap:11px;margin-bottom:12px}
+.pkg-head .no{font-family:'Fraunces';font-weight:600;font-size:15px;color:#fff;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;flex:none}
+.pkg-head h2{font-family:'Fraunces';font-weight:600;font-size:19px}
+.pkg-head code{font-family:'JetBrains Mono';font-size:12px;background:rgba(255,255,255,.6);padding:2px 8px;border-radius:6px;color:var(--lilac-700)}
+.pkg-head .role{margin-left:auto;font-size:13px;font-weight:600;color:var(--ink-soft)}
+.cards{display:flex;gap:11px;flex-wrap:wrap;align-items:flex-start}
 
-  code{font-family:'Courier New',monospace;font-size:.92em;background:#f2f2f4;padding:1px 4px;border:1px solid #e2e2e6}
-  pre{font-family:'Courier New',monospace;font-size:12.5px;line-height:1.55;background:#f7f7f9;border:1px solid var(--rule);
-      padding:14px 16px;overflow-x:auto;margin:12px 0;white-space:pre}
-  .fig{font-family:Arial,Helvetica,sans-serif;font-size:12px;color:var(--soft);margin:4px 0 16px;text-align:center}
+.cls{background:#fff;border-radius:11px;width:236px;overflow:hidden;box-shadow:0 8px 20px -14px rgba(108,80,168,.5);border:1px solid var(--lilac-100)}
+.cls .name{font-family:'Fraunces';font-weight:600;font-size:13.5px;padding:7px 11px;text-align:center;border-bottom:1px solid var(--lilac-200);color:var(--ink)}
+.cls .name small{font-family:'JetBrains Mono';font-weight:400;font-size:9px;color:var(--lilac-500);display:block}
+.cls .attr,.cls .meth{padding:6px 11px;font-family:'JetBrains Mono';font-size:10.5px;line-height:1.62;color:var(--ink-soft)}
+.cls .meth{border-top:1px solid var(--lilac-100)}
+.cls .attr span{color:#8a6fb0}
+.cls .meth span{color:var(--lilac-700)}
+.cls .cmt{color:var(--lilac-400)}
 
-  /* UML class reference blocks */
-  .uml{font-family:'Courier New',monospace;font-size:12.5px;line-height:1.5;border:1px solid var(--rule);margin:10px 0}
-  .uml .cn{background:#f0f0f3;border-bottom:1px solid var(--rule);padding:5px 12px;font-weight:bold}
-  .uml .cn small{font-weight:normal;color:var(--soft)}
-  .uml .sec{padding:6px 12px}
-  .uml .sec + .sec{border-top:1px dashed var(--rule)}
-  .uml .k{color:#444}
-
-  .qa{border-left:3px solid var(--accent);padding:4px 0 4px 16px;margin:12px 0}
-  .qa .q{font-weight:bold}
-  .note{font-family:Arial,Helvetica,sans-serif;font-size:12.5px;color:var(--soft);border-top:1px solid var(--rule);margin-top:40px;padding-top:12px}
-  @media print{ body{background:#fff} .page{box-shadow:none;border:none;margin:0;max-width:none} }
+.t-model{background:linear-gradient(135deg,#fff,var(--blush) 320%)}
+.t-data{background:linear-gradient(135deg,#fff,var(--sky) 300%)}
+.t-service{background:linear-gradient(135deg,#fff,var(--mint) 300%)}
+.t-net{background:linear-gradient(135deg,#fff,var(--butter) 320%)}
+.t-server{background:linear-gradient(135deg,#fff,var(--peach) 300%)}
+.t-ui{background:linear-gradient(135deg,#fff,var(--lilac-100) 200%)}
+.c-model{background:#e0788b}.c-data{background:#6f8fd6}.c-service{background:#5cc09a}
+.c-net{background:#c9a227}.c-server{background:#f59e8b}.c-ui{background:var(--lilac-600)}
+.foundation{border:2px dashed var(--lilac-400)}
+.foundation .pkg-head h2:after{content:" · FOUNDATION";font-family:'JetBrains Mono';font-size:12px;color:var(--lilac-500)}
+.doclink{display:inline-block;margin-top:12px;font-family:'Fraunces';font-style:italic;font-size:20px;
+  color:var(--lilac-700);text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px}
+.doclink:hover{color:var(--lilac-500)}
 </style>
 </head>
 <body>
-<div class="page">
 
-  <div class="cover">
-    <div class="kind">Technical Documentation</div>
-    <h1>vibematch</h1>
-    <div class="meta">
-      A Bilkent student community application (Java) &nbsp;·&nbsp; July 2026<br>
-      Source: <a href="https://github.com/nosey-dewdrop/vibematch">github.com/nosey-dewdrop/vibematch</a>
-      &nbsp;·&nbsp; Class diagram: <a href="uml.html">uml.html</a>
+<div class="head">
+  <h1>vibematch — <em>UML</em> Class Diagram</h1>
+  <p>Each box: <b>name</b> / <b>fields (−private)</b> / <b>methods (+public)</b>. Top (1) is the foundation; each layer depends on the one above (▲).</p>
+  <p><a class="doclink" href="documentation.html">documentation!</a></p>
+</div>
+<div class="legend">
+  <span>− private field</span><span>+ public method</span><span>▲ depends on</span><span>◇→ has-a (self reference)</span>
+</div>
+
+<div class="stack">
+
+  <!-- 1 MODEL -->
+  <div class="pkg t-model foundation">
+    <div class="pkg-head"><span class="no c-model">1</span><h2>Data</h2><code>model</code><span class="role">just data · the foundation</span></div>
+    <div class="cards">
+      <div class="cls"><div class="name">User</div>
+        <div class="attr"><span>-</span>username, displayName, email<br><span>-</span>passHash, salt, bio<br><span>-</span>verified, mbtiType, interests[]</div>
+        <div class="meth"><span>+</span>hasVibe(): boolean</div></div>
+      <div class="cls"><div class="name">Community</div>
+        <div class="attr"><span>-</span>id, name, description<br><span>-</span>category, emoji, tags[]<br><span>-</span>memberCount, matchPercent, member</div>
+        <div class="meth"><span>+</span>get/set... </div></div>
+      <div class="cls"><div class="name">Post</div>
+        <div class="attr"><span>-</span>id, communityId<br><span>-</span>author, title, body<br><span>-</span>commentCount</div>
+        <div class="meth"><span>+</span>get/set...</div></div>
+      <div class="cls"><div class="name">Comment</div>
+        <div class="attr"><span>-</span>id, postId, author<br><span>-</span>body, <b>parentId</b> ◇→ self<br><span class="cmt">// 0=top-level, &gt;0=reply</span></div>
+        <div class="meth"><span>+</span>isTopLevel(): boolean</div></div>
+      <div class="cls"><div class="name">Message</div>
+        <div class="attr"><span>-</span>id, sender, receiver<br><span>-</span>body, createdAt, read</div>
+        <div class="meth"><span>+</span>get/set...</div></div>
+      <div class="cls"><div class="name">MbtiResult</div>
+        <div class="attr"><span>-</span>type <span class="cmt">(INFP)</span><br><span>-</span>eiPercent, snPercent<br><span>-</span>tfPercent, jpPercent</div>
+        <div class="meth"><span>+</span>getType(), get..Percent()</div></div>
+      <div class="cls"><div class="name">Notification</div>
+        <div class="attr"><span>-</span>id, username, type<br><span>-</span>text, createdAt, read</div>
+        <div class="meth"><span>+</span>get/set...</div></div>
+      <div class="cls"><div class="name">Interests / Categories<small>&lt;&lt;static&gt;&gt;</small></div>
+        <div class="attr"><span>-</span>ALL[] <span class="cmt">// interest & category lists</span></div>
+        <div class="meth"><span>+</span>emojiFor(name): String</div></div>
     </div>
   </div>
 
-  <div class="toc">
-    <b>Contents</b>
-    <a href="#s1">1. Overview</a>
-    <a href="#s2">2. Design approach — dependency-first</a>
-    <a href="#s3">3. Build order (what we built, and why in this order)</a>
-    <a href="#s4">4. Architecture and class reference</a>
-    <a href="#s5">5. Email verification</a>
-    <a href="#s6">6. Sockets and real-time communication</a>
-    <a href="#s7">7. Friends and privacy</a>
-    <a href="#s8">8. Notifications</a>
-    <a href="#s9">9. Summary</a>
+  <div class="between"><span class="line">▲</span> DAOs use the model</div>
+
+  <!-- 2 DATA -->
+  <div class="pkg t-data">
+    <div class="pkg-head"><span class="no c-data">2</span><h2>Access &amp; Storage</h2><code>data</code><span class="role">SQL only here</span></div>
+    <div class="cards">
+      <div class="cls"><div class="name">Db<small>&lt;&lt;SQLite&gt;&gt;</small></div>
+        <div class="attr"><span>-</span>connection</div>
+        <div class="meth"><span>+</span>connect() <span>+</span>getConnection()<br><span>+</span>close() <span class="cmt">// creates the tables</span></div></div>
+      <div class="cls"><div class="name">UserDao</div>
+        <div class="meth"><span>+</span>insert(u) <span>+</span>findByUsername()<br><span>+</span>findByEmail() <span>+</span>emailExists()<br><span>+</span>setVerified() <span>+</span>updateMbti()<br><span>+</span>get/setInterests()</div></div>
+      <div class="cls"><div class="name">CommunityDao</div>
+        <div class="meth"><span>+</span>insert() <span>+</span>addTag() <span>+</span>getTags()<br><span>+</span>getAll() <span>+</span>getByCategory()<br><span>+</span>search() <span>+</span>join() <span>+</span>leave()<br><span>+</span>isMember() <span>+</span>getJoined()<br><span>+</span>memberCount() <span>+</span>getMemberUsernames()</div></div>
+      <div class="cls"><div class="name">PostDao</div>
+        <div class="meth"><span>+</span>insertPost() <span>+</span>findPost()<br><span>+</span>getPostsForCommunity()<br><span>+</span>insertComment() <span>+</span>getComments()<br><span>+</span>commentCount()</div></div>
+      <div class="cls"><div class="name">MessageDao</div>
+        <div class="meth"><span>+</span>send(m)<br><span>+</span>getConversation(a,b)<br><span>+</span>getPartners(user)</div></div>
+      <div class="cls"><div class="name">FriendDao</div>
+        <div class="meth"><span>+</span>request() <span>+</span>accept() <span>+</span>decline()<br><span>+</span>areFriends() <span>+</span>relationFor()<br><span>+</span>getFriends()<br><span>+</span>getIncomingRequests()</div></div>
+      <div class="cls"><div class="name">NotificationDao</div>
+        <div class="meth"><span>+</span>insert()<br><span>+</span>forUser()<br><span>+</span>unreadCount()<br><span>+</span>markAllRead()</div></div>
+      <div class="cls"><div class="name">SampleData<small>&lt;&lt;seed&gt;&gt;</small></div>
+        <div class="meth"><span>+</span>seedIfNeeded()<br><span class="cmt">// sample data on first run</span></div></div>
+    </div>
   </div>
 
-  <h2 id="s1"><span class="num">1</span>Overview</h2>
-  <p>vibematch is a community application for Bilkent University students. A user
-     signs up with their Bilkent email, verifies it with a code, selects their
-     interests, and takes a short 16-question personality test. The application then
-     recommends communities (clubs, societies, study circles) that match the user's
-     interests and personality. Each community has a forum with threaded discussions,
-     and users can add friends and exchange direct messages.</p>
-  <p>The application is written in Java. It is built as a <strong>client/server
-     system</strong>: a server program holds a single shared database and pushes
-     real-time updates, and a desktop client (Java Swing) connects to it over a
-     network socket. This document explains what was built, in what order, and the
-     reasoning behind each decision.</p>
+  <div class="between"><span class="line">▲</span> services call DAOs</div>
 
-  <h2 id="s2"><span class="num">2</span>Design approach — dependency-first</h2>
-  <p>The whole system was built <strong>bottom-up</strong>, following one rule:
-     <em>a component is never built before the components it depends on.</em> This is
-     the same logic as constructing a building — the foundation is poured before the
-     walls are raised, and the plumbing is installed before the painting.</p>
-  <p>The code is organised into layers, and <strong>each layer depends only on the
-     layer below it</strong>. This keeps the system maintainable: a change in one
-     layer does not break the layers above it. From bottom (built first) to top:</p>
-  <pre>Layer 1  model        plain data classes            (the foundation)
-Layer 2  data         database + DAO classes        (all SQL lives here)
-Layer 3  service      business rules
-Layer 4  server       socket server + handlers      (network / concurrency)
-Layer 5  net          client-side connection (Api)
-Layer 6  ui / screens what the user sees</pre>
-  <p class="fig">Figure 1. Layered architecture. A request travels up from the
-     screen; data returns back down. See <a href="uml.html">uml.html</a> for the full
-     class diagram.</p>
-  <p>The project history on GitHub is roughly forty small commits, each adding a
-     single component in this order. The commit history is itself evidence that the
-     system was built incrementally rather than all at once.</p>
-
-  <h2 id="s3"><span class="num">3</span>Build order</h2>
-  <ol>
-    <li><strong>Model (data classes).</strong> User, Community, Post, Comment,
-      Message. Built first because every other layer uses them; you cannot design
-      storage without knowing what is being stored.</li>
-    <li><strong>Database and DAOs.</strong> An SQLite database and one data-access
-      class per table. All SQL is confined to these classes, so the storage engine
-      could be replaced without touching anything above.</li>
-    <li><strong>Services (rules).</strong> AuthService (Bilkent-email rule),
-      MatchService (scoring), MbtiService. Built once data access existed, so rules
-      could be layered on top of it.</li>
-    <li><strong>Identity — the first real feature.</strong> Register, login, email
-      verification. Built first among features because, without a user, nothing has
-      an owner — no message, no membership, no match. Identity is the backbone.</li>
-    <li><strong>Onboarding, communities, forum, messages.</strong> In this order,
-      because matching needs the vibe, the forum needs communities, and messaging
-      needs users. Each feature depends on the previous one.</li>
-    <li><strong>Client/server conversion.</strong> Only after the logic worked was
-      the data moved behind a socket server. Correctness is verified first, then the
-      working system is placed on the network.</li>
-    <li><strong>Speed, friends, notifications.</strong> Added last, because the core
-      already functioned; these are refinements.</li>
-  </ol>
-
-  <h2 id="s4"><span class="num">4</span>Architecture and class reference</h2>
-  <p>The main classes, grouped by layer. Notation: <code>-</code> private field,
-     <code>+</code> public method.</p>
-
-  <h3>Layer 1 — model</h3>
-  <div class="uml">
-    <div class="cn">User <small>· model</small></div>
-    <div class="sec">- username, displayName, email, passHash, salt, bio, verified, mbtiType, interests[]</div>
-    <div class="sec">+ hasVibe()</div>
-  </div>
-  <div class="uml">
-    <div class="cn">Community</div>
-    <div class="sec">- id, name, description, category, emoji, tags[], memberCount, matchPercent, member</div>
-  </div>
-  <div class="uml">
-    <div class="cn">Post &nbsp;/&nbsp; Comment &nbsp;/&nbsp; Message</div>
-    <div class="sec">Post: - id, communityId, author, title, body, commentCount</div>
-    <div class="sec">Comment: - id, postId, author, body, <b>parentId</b> (0 = top-level, &gt;0 = reply to that comment)</div>
-    <div class="sec">Message: - id, sender, receiver, body, createdAt, read</div>
-  </div>
-  <div class="uml">
-    <div class="cn">MbtiResult &nbsp;/&nbsp; Notification</div>
-    <div class="sec">MbtiResult: - type (e.g. INFP), eiPercent, snPercent, tfPercent, jpPercent</div>
-    <div class="sec">Notification: - id, username, type, text, createdAt, read</div>
+  <!-- 3 SERVICE -->
+  <div class="pkg t-service">
+    <div class="pkg-head"><span class="no c-service">3</span><h2>Rules</h2><code>service</code><span class="role">business logic</span></div>
+    <div class="cards">
+      <div class="cls"><div class="name">AuthService</div>
+        <div class="meth"><span>+</span>register(name,user,mail,pass)<br><span>+</span>login(userOrMail,pass)<br><span>+</span>markVerified()<br><span>+</span>generateVerificationCode()</div></div>
+      <div class="cls"><div class="name">MatchService</div>
+        <div class="meth"><span>+</span>scoreFor(user,comm): int<br><span>+</span>topMatches(user,list,n)<br><span>+</span>reason(user,comm)<br><span class="cmt">// interests 65% + mbti 35%</span></div></div>
+      <div class="cls"><div class="name">MbtiService</div>
+        <div class="meth"><span>+</span>getQuestions()<br><span>+</span>score(answers[]): MbtiResult<br><span>+</span>archetypeName/Emoji/Blurb()</div></div>
+      <div class="cls"><div class="name">CommunityService</div>
+        <div class="meth"><span>+</span>getAll() <span>+</span>findById()<br><span>+</span>getByCategory() <span>+</span>search()<br><span>+</span>getJoined() <span>+</span>isMember()<br><span>+</span>join() <span>+</span>leave()</div></div>
+    </div>
   </div>
 
-  <h3>Layer 2 — data (SQL only here)</h3>
-  <div class="uml">
-    <div class="cn">Db <small>· SQLite</small></div>
-    <div class="sec">+ connect() &nbsp; + getConnection() &nbsp; + close() &nbsp; <span class="k">// creates all tables</span></div>
-  </div>
-  <div class="uml">
-    <div class="cn">UserDao</div>
-    <div class="sec">+ insert() + findByUsername() + findByEmail() + setVerified() + updateMbti() + get/setInterests()</div>
-  </div>
-  <div class="uml">
-    <div class="cn">CommunityDao</div>
-    <div class="sec">+ insert() + getAll() + getByCategory() + search() + join() + leave() + isMember() + getJoined() + memberCount()</div>
-  </div>
-  <div class="uml">
-    <div class="cn">PostDao &nbsp;/&nbsp; MessageDao &nbsp;/&nbsp; FriendDao &nbsp;/&nbsp; NotificationDao</div>
-    <div class="sec">PostDao: + insertPost() + getPostsForCommunity() + insertComment() + getComments()</div>
-    <div class="sec">MessageDao: + send() + getConversation() + getPartners()</div>
-    <div class="sec">FriendDao: + request() + accept() + decline() + areFriends() + getFriends() + getIncomingRequests()</div>
-    <div class="sec">NotificationDao: + insert() + forUser() + unreadCount() + markAllRead()</div>
+  <div class="between"><span class="line">▲</span> handlers call services</div>
+
+  <!-- 4 SERVER -->
+  <div class="pkg t-server">
+    <div class="pkg-head"><span class="no c-server">4</span><h2>Server</h2><code>server</code><span class="role">network + concurrency (sockets)</span></div>
+    <div class="cards">
+      <div class="cls"><div class="name">ChatServer</div>
+        <div class="attr"><span>-</span>online{ user → handler }</div>
+        <div class="meth"><span>+</span>start() <span class="cmt">// accept loop</span><br><span>+</span>register() <span>+</span>unregister()<br><span>+</span>pushTo() <span>+</span>pushToMany()</div></div>
+      <div class="cls"><div class="name">ClientHandler<small>implements Runnable</small></div>
+        <div class="attr"><span>-</span>socket, in, out, username</div>
+        <div class="meth"><span>+</span>run() <span class="cmt">// read → route → write</span><br><span>+</span>send(response)</div></div>
+      <div class="cls"><div class="name">RequestRouter</div>
+        <div class="meth"><span>+</span>handle(req, client)<br><span class="cmt">// action → right handler</span></div></div>
+      <div class="cls"><div class="name">AuthHandler</div>
+        <div class="meth"><span>+</span>register() <span>+</span>verify()<br><span>+</span>resend() <span>+</span>login()</div></div>
+      <div class="cls"><div class="name">ProfileHandler</div>
+        <div class="meth"><span>+</span>setInterests()<br><span>+</span>submitMbti() <span>+</span>getUser()</div></div>
+      <div class="cls"><div class="name">CommunityHandler</div>
+        <div class="meth"><span>+</span>list() <span>+</span>get() <span>+</span>search()<br><span>+</span>byCategory() <span>+</span>joined()<br><span>+</span>join() <span>+</span>leave()<br><span>+</span>homeMatches() <span>+</span>scoreOne()</div></div>
+      <div class="cls"><div class="name">ForumHandler</div>
+        <div class="meth"><span>+</span>posts() <span>+</span>createPost()<br><span>+</span>comments() <span>+</span>addComment()<br><span class="cmt">// +push forumUpdate</span></div></div>
+      <div class="cls"><div class="name">MessageHandler</div>
+        <div class="meth"><span>+</span>partners() <span>+</span>conversation()<br><span>+</span>send() <span class="cmt">// friendship check + push</span><br><span>+</span>findUser()</div></div>
+      <div class="cls"><div class="name">FriendHandler</div>
+        <div class="meth"><span>+</span>sendRequest() <span>+</span>respond()<br><span>+</span>friends() <span>+</span>requests()<br><span>+</span>status()</div></div>
+      <div class="cls"><div class="name">NotificationHandler</div>
+        <div class="meth"><span>+</span>list() <span>+</span>unread()<br><span>+</span>markRead()</div></div>
+      <div class="cls"><div class="name">Notifier / Dto<small>&lt;&lt;helper&gt;&gt;</small></div>
+        <div class="meth"><span>+</span>notify(server,user,type,text)<br><span>+</span>safeUser() <span class="cmt">// hides the password</span></div></div>
+    </div>
   </div>
 
-  <h3>Layer 3 — service (rules)</h3>
-  <div class="uml">
-    <div class="cn">AuthService &nbsp;/&nbsp; MatchService &nbsp;/&nbsp; MbtiService &nbsp;/&nbsp; CommunityService</div>
-    <div class="sec">AuthService: + register() + login() + markVerified() + generateVerificationCode()</div>
-    <div class="sec">MatchService: + scoreFor(user, community) + topMatches() + reason() &nbsp; <span class="k">// interests 65% + personality 35%</span></div>
-    <div class="sec">MbtiService: + getQuestions() + score(answers) + archetypeName/Emoji/Blurb()</div>
-    <div class="sec">CommunityService: + getAll() + search() + join() + leave() + getJoined() + isMember()</div>
+  <div class="between"><span class="line">▲</span> client connects over a socket (JSON: request/reply + push)</div>
+
+  <!-- 5 NET -->
+  <div class="pkg t-net">
+    <div class="pkg-head"><span class="no c-net">5</span><h2>Client Bridge</h2><code>net · protocol</code><span class="role">connects to the server</span></div>
+    <div class="cards">
+      <div class="cls"><div class="name">Api<small>&lt;&lt;facade&gt;&gt;</small></div>
+        <div class="meth"><span>+</span>login() <span>+</span>register() <span>+</span>verify()<br><span>+</span>homeMatches() <span>+</span>listCommunities()<br><span>+</span>posts() <span>+</span>createPost() <span>+</span>addComment()<br><span>+</span>conversation() <span>+</span>sendMessage()<br><span>+</span>sendFriendRequest() <span>+</span>respondToRequest()<br><span>+</span>notifications() <span>+</span>unreadCount()</div></div>
+      <div class="cls"><div class="name">ServerClient<small>&lt;&lt;singleton&gt;&gt;</small></div>
+        <div class="attr"><span>-</span>socket, pending{}, listeners[]</div>
+        <div class="meth"><span>+</span>connect(host,port)<br><span>+</span>send(action,data): String<br><span>+</span>add/removePushListener()</div></div>
+      <div class="cls"><div class="name">Request · Response<small>protocol</small></div>
+        <div class="attr"><span>-</span>Req: id, action, data<br><span>-</span>Res: type, ok, error, event, data</div>
+        <div class="meth"><span>+</span>reply() <span>+</span>fail() <span>+</span>push()</div></div>
+      <div class="cls"><div class="name">Json · Params<small>protocol</small></div>
+        <div class="meth"><span>+</span>toJson() <span>+</span>fromJson()<br><span>+</span>parse() <span>+</span>of() <span>+</span>put()</div></div>
+      <div class="cls"><div class="name">PushListener<small>&lt;&lt;interface&gt;&gt;</small></div>
+        <div class="meth"><span>+</span>onPush(event, dataJson)</div></div>
+    </div>
   </div>
 
-  <h3>Layer 4 — server (network + concurrency)</h3>
-  <div class="uml">
-    <div class="cn">ChatServer</div>
-    <div class="sec">- online { username &rarr; handler }</div>
-    <div class="sec">+ start() <span class="k">// accept loop</span> &nbsp; + register() + unregister() + pushTo() + pushToMany()</div>
-  </div>
-  <div class="uml">
-    <div class="cn">ClientHandler <small>· Runnable</small> &nbsp;/&nbsp; RequestRouter</div>
-    <div class="sec">ClientHandler: + run() <span class="k">// read &rarr; route &rarr; write</span> &nbsp; + send(response)</div>
-    <div class="sec">RequestRouter: + handle(request) <span class="k">// maps an action name to the right handler</span></div>
-  </div>
-  <div class="uml">
-    <div class="cn">Handlers</div>
-    <div class="sec">AuthHandler: + register() + verify() + login()</div>
-    <div class="sec">CommunityHandler: + list() + join() + homeMatches() + scoreOne()</div>
-    <div class="sec">ForumHandler: + createPost() + addComment() &nbsp; <span class="k">// pushes forumUpdate</span></div>
-    <div class="sec">MessageHandler: + send() &nbsp; <span class="k">// checks friendship, then pushes</span></div>
-    <div class="sec">FriendHandler: + sendRequest() + respond() + friends() + requests()</div>
-    <div class="sec">NotificationHandler: + list() + unread() + markRead()</div>
-    <div class="sec">Notifier + notify() &nbsp;·&nbsp; Dto + safeUser() <span class="k">// strips the password hash</span></div>
-  </div>
+  <div class="between"><span class="line">▲</span> screens call the Api (no SQL / no rules)</div>
 
-  <h3>Layer 5 — net (client bridge)</h3>
-  <div class="uml">
-    <div class="cn">Api <small>· facade</small> &nbsp;/&nbsp; ServerClient <small>· singleton</small></div>
-    <div class="sec">Api: + login() + homeMatches() + posts() + sendMessage() + sendFriendRequest() + notifications() ...</div>
-    <div class="sec">ServerClient: - socket, pending{}, listeners[] &nbsp; + connect() + send(action, data) + addPushListener()</div>
-    <div class="sec">protocol: Request(id, action, data), Response(type, ok, error, event, data), Json, Params</div>
-  </div>
-
-  <h3>Layer 6 — ui / screens</h3>
-  <div class="uml">
-    <div class="cn">Screens (Java Swing JPanels)</div>
-    <div class="sec">MainWindow: + navigate() + openCommunity() + onPush() <span class="k">// forwards a push to the open screen</span></div>
-    <div class="sec">LoginScreen, RegisterScreen, VerifyScreen, InterestPanel, MbtiTestPanel, VibeResultPanel,</div>
-    <div class="sec">HomePanel, DiscoverPanel, CommunityDetailPanel, PostDetailPanel, MessagesPanel,</div>
-    <div class="sec">NotificationsPanel, ProfilePanel, SettingsPanel &nbsp;·&nbsp; ui: Theme, RoundedButton, CommunityCard, BackgroundTask</div>
-  </div>
-
-  <h2 id="s5"><span class="num">5</span>Email verification</h2>
-  <p>Only Bilkent students may register, and the email is confirmed before the
-     account can be used. The sequence is:</p>
-  <ol>
-    <li>The user enters a name, a Bilkent email, and a password.</li>
-    <li><code>AuthService.register()</code> checks the email domain and that the
-      username and email are not already taken, then saves the account as
-      <em>unverified</em>.</li>
-    <li>The server generates a random 6-digit code and keeps it in memory.</li>
-    <li><code>EmailSender</code> sends the code by SMTP (JavaMail). If SMTP is not
-      configured, the code is shown in a dialog so the application still works.</li>
-    <li>The user enters the code; the server compares it and marks the account
-      <em>verified</em>. Login is refused until the account is verified.</li>
-  </ol>
-  <div class="qa">
-    <p class="q">Why the dialog fallback?</p>
-    <p>Sending real email requires a private password, which is never committed to
-       the repository. The fallback lets the application run and be evaluated on a
-       machine with no email credentials, without exposing any secret.</p>
-  </div>
-  <div class="qa">
-    <p class="q">How is the password stored?</p>
-    <p>Never in plain text. Each user has a random salt, and the stored value is a
-       SHA-256 hash of the salt combined with the password (<code>PasswordUtil</code>).
-       The server never sends the hash to a client.</p>
-  </div>
-
-  <h2 id="s6"><span class="num">6</span>Sockets and real-time communication</h2>
-  <p><strong>What a socket is.</strong> A socket is a persistent two-way connection
-     between two programs over a network. Once open, either side may send data at any
-     time — comparable to a telephone call that stays connected, rather than sending
-     a single letter and waiting for a reply.</p>
-  <p><strong>Why it is needed.</strong> A community application has many users on
-     different computers who must see the same data. This requires (a) a single
-     shared store for the data, and (b) a way for the server to notify a user that
-     something has happened without the user repeatedly asking. A persistent socket
-     to a central server provides both. It also avoids paying for a hosted service:
-     the server is itself the shared database and the real-time channel.</p>
-  <p><strong>How it works here.</strong> The server was written with plain Java
-     sockets (<code>java.net.ServerSocket</code>), with no external networking
-     library. Messages are single lines of JSON.</p>
-  <pre>// server accept loop (ChatServer)
-while (true) {
-    Socket s = serverSocket.accept();          // wait for a client
-    new Thread(new ClientHandler(s)).start();  // one thread per client
-}
-
-// request / reply, matched by id
-client -> {"id":4,"action":"login","data":{...}}
-server -> {"type":"reply","id":4,"ok":true,"data":{...}}
-
-// real-time push: the server sends without being asked
-// when a direct message is sent to you:
-ChatServer.pushTo(you, {"type":"push","event":"newMessage",...})
-// it arrives on your socket immediately; no polling, no reloading</pre>
-  <p>The server keeps a map of <code>username → socket</code> for connected users, so
-     it knows where to deliver a push. Real-time messaging and forum updates use this
-     mechanism.</p>
-  <div class="qa">
-    <p class="q">Why plain sockets rather than a framework?</p>
-    <p>They are simpler to explain, have no dependencies, and represent classic socket
-       programming. The same server can later serve a second client (for example an
-       iOS application) without any change to the server itself.</p>
-  </div>
-
-  <h2 id="s7"><span class="num">7</span>Friends and privacy</h2>
-  <p>A user cannot message an arbitrary person. Messaging is restricted to friends,
-     following the model people already know from other applications:</p>
-  <ol>
-    <li>A friend request is sent and stored with status <em>pending</em>.</li>
-    <li>The recipient receives a real-time push and a notification.</li>
-    <li>When the recipient accepts, the status becomes <em>accepted</em>.</li>
-    <li>Only then does <code>MessageHandler.send()</code> permit a message between
-      the two users. A message to a non-friend is refused by the server.</li>
-  </ol>
-  <p>The rule is enforced on the server, not in the screen, because the screen can be
-     bypassed but the server cannot. The check lives in one place, so it holds for the
-     current desktop client and any future client.</p>
-
-  <h2 id="s8"><span class="num">8</span>Notifications</h2>
-  <p>Friend requests, accepted requests, new messages, and replies each create a
-     stored notification and push a live update. Stored notifications remain available
-     when the user logs in later; the live push updates the notification bell's unread
-     count immediately for a user who is online.</p>
-
-  <h2 id="s9"><span class="num">9</span>Summary</h2>
-  <p>vibematch was built in the direction of its dependencies: model, then storage,
-     then rules, then identity, then content, then interaction, then the network, and
-     finally the refinements. No component was built before the component it depends
-     on. The layered structure keeps each part independent, the socket server provides
-     shared data and real-time updates, and the friendship rule provides privacy. The
-     class diagram is available at <a href="uml.html">uml.html</a>.</p>
-
-  <div class="note">
-    vibematch · technical documentation · source at
-    <a href="https://github.com/nosey-dewdrop/vibematch">github.com/nosey-dewdrop/vibematch</a>
+  <!-- 6 UI / SCREENS -->
+  <div class="pkg t-ui">
+    <div class="pkg-head"><span class="no c-ui">6</span><h2>Interface</h2><code>ui / screens</code><span class="role">what the user sees (JPanel)</span></div>
+    <div class="cards">
+      <div class="cls"><div class="name">MainWindow<small>coordinator · PushListener</small></div>
+        <div class="meth"><span>+</span>navigate(key)<br><span>+</span>showHome/Discover/Messages...()<br><span>+</span>openCommunity() <span>+</span>openPost()<br><span>+</span>onPush() <span class="cmt">// forward to active screen</span></div></div>
+      <div class="cls"><div class="name">MbtiTestPanel</div>
+        <div class="meth"><span>-</span>render() <span>-</span>answer(choice)<br><span>-</span>finish() <span class="cmt">// api.submitMbti</span></div></div>
+      <div class="cls"><div class="name">HomePanel · DiscoverPanel</div>
+        <div class="meth"><span>-</span>loadMatches() / loadAll()<br><span class="cmt">// in the background via BackgroundTask</span></div></div>
+      <div class="cls"><div class="name">CommunityDetailPanel<small>PushListener</small></div>
+        <div class="meth"><span>-</span>buildPostList()<br><span>+</span>onPush() <span class="cmt">// forumUpdate → refresh</span></div></div>
+      <div class="cls"><div class="name">PostDetailPanel<small>PushListener</small></div>
+        <div class="meth"><span>-</span>buildCommentTree() <span class="cmt">// threading</span><br><span>+</span>onPush()</div></div>
+      <div class="cls"><div class="name">MessagesPanel<small>PushListener</small></div>
+        <div class="meth"><span>-</span>refreshLeft() <span>-</span>sendMessage()<br><span>-</span>addFriend()<br><span>+</span>onPush() <span class="cmt">// newMessage</span></div></div>
+      <div class="cls"><div class="name">NotificationsPanel · ProfilePanel</div>
+        <div class="meth"><span>-</span>load() / buildCard()</div></div>
+      <div class="cls"><div class="name">Login · Register · Verify</div>
+        <div class="meth"><span>-</span>doLogin() / doRegister() / doVerify()</div></div>
+      <div class="cls"><div class="name">ui: Theme · RoundedButton<br>CommunityCard · Chip · BackgroundTask<small>shared parts</small></div>
+        <div class="meth"><span>+</span>heading()/body() <span>+</span>start()<br><span class="cmt">// color, font, button, background work</span></div></div>
+    </div>
   </div>
 
 </div>
+
 </body>
 </html>
