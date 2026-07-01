@@ -91,6 +91,15 @@ public class AuthService {
         if (!u.isVerified()) {
             throw new IllegalArgumentException("Please verify your email first.");
         }
+        // if this account is still on the old hashing scheme, quietly upgrade it
+        // now that we have the plaintext password in hand
+        if (PasswordUtil.needsUpgrade(u.getPassHash())) {
+            String newSalt = PasswordUtil.generateSalt();
+            String newHash = PasswordUtil.hash(password, newSalt);
+            userDao.updatePassword(u.getUsername(), newHash, newSalt);
+            u.setSalt(newSalt);
+            u.setPassHash(newHash);
+        }
         return u;
     }
 

@@ -102,6 +102,22 @@ public class UserDao {
         runUpdate("UPDATE users SET bio = ? WHERE username = ?", bio, username);
     }
 
+    // used when we re-hash an old account's password to the newer scheme
+    public void updatePassword(String username, String passHash, String salt) {
+        try {
+            Connection c = Db.getConnection();
+            PreparedStatement ps = c.prepareStatement(
+                "UPDATE users SET pass_hash = ?, salt = ? WHERE username = ?");
+            ps.setString(1, passHash);
+            ps.setString(2, salt);
+            ps.setString(3, username);
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            throw new RuntimeException("could not update password", e);
+        }
+    }
+
     // ---- interests ----
 
     public ArrayList<String> getInterests(String username) {
