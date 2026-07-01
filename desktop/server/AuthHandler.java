@@ -56,7 +56,7 @@ public class AuthHandler {
         return Response.reply(req.id, Json.toJson(data));
     }
 
-    public Response verify(Request req) {
+    public Response verify(Request req, ClientHandler client, ChatServer server) {
         String username = req.getString("username");
         String typed = req.getString("code");
 
@@ -66,6 +66,10 @@ public class AuthHandler {
         }
         auth.markVerified(username);
         pendingCodes.remove(username);
+
+        // this connection now belongs to them, so mark it online for pushes
+        client.setUsername(username);
+        server.register(username, client);
 
         User user = userDao.findByUsername(username);
         return Response.reply(req.id, Json.toJson(Dto.safeUser(user)));

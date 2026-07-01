@@ -16,7 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import data.PostDao;
+import net.Api;
 import model.Post;
 import ui.RoundedButton;
 import ui.Theme;
@@ -28,7 +28,7 @@ import ui.UiHelper;
  */
 public class NewPostDialog extends JDialog {
 
-    private PostDao postDao = new PostDao();
+    private Api api = Api.get();
     private JTextField titleField = new JTextField();
     private JTextArea bodyArea = new JTextArea(5, 20);
     private JLabel errorLabel = new JLabel(" ");
@@ -82,8 +82,7 @@ public class NewPostDialog extends JDialog {
                     errorLabel.setText("Give your post a title.");
                     return;
                 }
-                Post p = new Post(communityId, author, t, bodyArea.getText().trim());
-                postDao.insertPost(p);
+                api.createPost(communityId, author, t, bodyArea.getText().trim());
                 dispose();
                 if (onPosted != null) {
                     onPosted.run();

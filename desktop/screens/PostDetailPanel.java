@@ -21,11 +21,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 
-import data.PostDao;
 import model.Comment;
 import model.Community;
 import model.Post;
 import model.User;
+import net.Api;
+import protocol.Json;
 import ui.RoundedButton;
 import ui.RoundedPanel;
 import ui.Theme;
@@ -36,13 +37,13 @@ import ui.UiHelper;
  * under their parent (the reddit style). You can add a top level comment at the
  * bottom or reply to any comment.
  */
-public class PostDetailPanel extends JPanel {
+public class PostDetailPanel extends JPanel implements net.PushListener {
 
     private MainWindow main;
     private User user;
     private Post post;
     private Community community;
-    private PostDao postDao = new PostDao();
+    private Api api = Api.get();
 
     private JTextField commentField = new JTextField();
 
@@ -113,7 +114,7 @@ public class PostDetailPanel extends JPanel {
         body.add(card);
         body.add(UiHelper.vgap(18));
 
-        ArrayList<Comment> comments = postDao.getComments(post.getId());
+        ArrayList<Comment> comments = api.comments(post.getId());
         JLabel header = UiHelper.title(comments.size() + " comments", 16);
         header.setAlignmentX(Component.LEFT_ALIGNMENT);
         body.add(header);
@@ -226,7 +227,7 @@ public class PostDetailPanel extends JPanel {
         if (text.isEmpty()) {
             return;
         }
-        postDao.insertComment(new Comment(post.getId(), user.getUsername(), text, 0));
+        api.addComment(post.getId(), user.getUsername(), text, 0);
         commentField.setText("");
         main.openPost(post, community); // reload to show it
     }
@@ -234,7 +235,19 @@ public class PostDetailPanel extends JPanel {
     private void replyTo(Comment parent) {
         String text = JOptionPane.showInputDialog(this, "Reply to " + parent.getAuthor() + ":");
         if (text != null && !text.trim().isEmpty()) {
-            postDao.insertComment(new Comment(post.getId(), user.getUsername(), text.trim(), parent.getId()));
+            api.addComment(post.getId(), user.getUsername(), text.trim(), parent.getId());
+            main.openPost(post, community);
+        }
+    }
+
+    // the server pushed a forum update. if it's for this community, reload so a
+    // comment someone else just wrote shows up on its own, in real time.
+    public void onPush(String event, String dataJson) {
+        if (!event.equals("forumUpdate")) {
+            return;
+        }
+        int communityId = Json.parse(dataJson).get("communityId").getAsInt();
+        if (communityId == community.getId()) {
             main.openPost(post, community);
         }
     }

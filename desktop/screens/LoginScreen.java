@@ -17,7 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import model.User;
-import service.AuthService;
+import net.Api;
 import ui.RoundedButton;
 import ui.Session;
 import ui.Theme;
@@ -30,7 +30,7 @@ import ui.UiHelper;
 public class LoginScreen extends JPanel {
 
     private AppFrame appFrame;
-    private AuthService auth = new AuthService();
+    private Api api = Api.get();
 
     private JTextField userField = new JTextField();
     private JPasswordField passField = new JPasswordField();
@@ -129,7 +129,7 @@ public class LoginScreen extends JPanel {
         String user = userField.getText();
         String pass = new String(passField.getPassword());
         try {
-            User u = auth.login(user, pass);
+            User u = api.login(user, pass);
             Session.setUser(u);
             appFrame.routeAfterLogin(u);
         } catch (IllegalArgumentException ex) {

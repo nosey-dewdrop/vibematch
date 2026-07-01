@@ -16,6 +16,8 @@ import javax.swing.JPanel;
 
 import model.Community;
 import model.User;
+import net.PushListener;
+import net.ServerClient;
 import ui.RoundedPanel;
 import ui.Theme;
 import ui.UiHelper;
@@ -25,12 +27,13 @@ import ui.UiHelper;
  * the rest of the window is whatever screen is selected. The inner panels
  * (home, discover, ...) call back here to switch around.
  */
-public class MainWindow extends JPanel {
+public class MainWindow extends JPanel implements PushListener {
 
     private AppFrame appFrame;
     private User user;
 
     private JPanel content;
+    private JComponent currentPanel;
     private ArrayList<NavButton> navButtons = new ArrayList<NavButton>();
 
     public MainWindow(AppFrame appFrame, User user) {
@@ -46,7 +49,19 @@ public class MainWindow extends JPanel {
         content.setBackground(Theme.BG);
         add(content, BorderLayout.CENTER);
 
+        // one place listens for server pushes and forwards them to whatever
+        // screen is open right now (if that screen cares). this way we never
+        // pile up stale listeners as the user moves around.
+        ServerClient.getInstance().addPushListener(this);
+
         showHome();
+    }
+
+    // a push arrived from the server. hand it to the open screen if it wants it.
+    public void onPush(String event, String dataJson) {
+        if (currentPanel instanceof PushListener) {
+            ((PushListener) currentPanel).onPush(event, dataJson);
+        }
     }
 
     public User getUser() {
@@ -55,6 +70,11 @@ public class MainWindow extends JPanel {
 
     public AppFrame getAppFrame() {
         return appFrame;
+    }
+
+    // stop listening for pushes (called on logout, before this window is dropped)
+    public void detach() {
+        ServerClient.getInstance().removePushListener(this);
     }
 
     // ---- sidebar ----
@@ -147,6 +167,7 @@ public class MainWindow extends JPanel {
     }
 
     public void setContent(JComponent panel) {
+        currentPanel = panel;
         content.removeAll();
         content.add(panel, BorderLayout.CENTER);
         content.revalidate();

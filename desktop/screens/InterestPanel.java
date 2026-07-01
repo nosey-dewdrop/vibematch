@@ -13,9 +13,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import data.UserDao;
 import model.Interests;
 import model.User;
+import net.Api;
 import ui.Chip;
 import ui.RoundedButton;
 import ui.Session;
@@ -32,7 +32,7 @@ public class InterestPanel extends JPanel {
 
     private AppFrame appFrame;
     private User user;
-    private UserDao userDao = new UserDao();
+    private Api api = Api.get();
 
     private ArrayList<Chip> chips = new ArrayList<Chip>();
     private RoundedButton continueBtn;
@@ -123,7 +123,7 @@ public class InterestPanel extends JPanel {
                 picked.add(Interests.ALL[i]);
             }
         }
-        userDao.setInterests(user.getUsername(), picked);
+        api.setInterests(user.getUsername(), picked);
         user.setInterests(picked);
         Session.setUser(user);
         appFrame.startMbti(user);

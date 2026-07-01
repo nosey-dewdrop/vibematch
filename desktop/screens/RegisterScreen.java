@@ -16,12 +16,10 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import model.User;
-import service.AuthService;
+import net.Api;
 import ui.RoundedButton;
 import ui.Theme;
 import ui.UiHelper;
-import util.EmailSender;
 
 /*
  * Sign up screen. Collects name / username / email / password, creates the
@@ -30,7 +28,7 @@ import util.EmailSender;
 public class RegisterScreen extends JPanel {
 
     private AppFrame appFrame;
-    private AuthService auth = new AuthService();
+    private Api api = Api.get();
 
     private JTextField nameField = new JTextField();
     private JTextField userField = new JTextField();
@@ -129,18 +127,16 @@ public class RegisterScreen extends JPanel {
             String email = emailField.getText();
             String pass = new String(passField.getPassword());
 
-            User u = auth.register(name, username, email, pass);
-
-            // make a code and try to email it. if that doesnt work we just show it.
-            String code = auth.generateVerificationCode();
-            boolean sent = EmailSender.sendVerificationCode(u.getEmail(), code);
-            if (!sent) {
+            // the server creates the account, makes the code and tries to email
+            // it. if email isnt set up it sends the code back so we can show it.
+            Api.RegisterResult result = api.register(name, username, email, pass);
+            if (!result.emailed) {
                 JOptionPane.showMessageDialog(this,
-                    "Email isn't set up, so here is your code:\n\n   " + code,
+                    "Email isn't set up, so here is your code:\n\n   " + result.code,
                     "Verification code",
                     JOptionPane.INFORMATION_MESSAGE);
             }
-            appFrame.showVerify(u, code);
+            appFrame.showVerify(result.username, result.email);
         } catch (IllegalArgumentException ex) {
             errorLabel.setText(ex.getMessage());
         }

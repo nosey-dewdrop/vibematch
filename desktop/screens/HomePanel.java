@@ -16,8 +16,7 @@ import javax.swing.ScrollPaneConstants;
 
 import model.Community;
 import model.User;
-import service.CommunityService;
-import service.MatchService;
+import net.Api;
 import ui.RoundedPanel;
 import ui.Theme;
 import ui.UiHelper;
@@ -31,8 +30,7 @@ public class HomePanel extends JPanel implements CommunityCard.Listener {
 
     private MainWindow main;
     private User user;
-    private CommunityService communities = new CommunityService();
-    private MatchService matcher = new MatchService();
+    private Api api = Api.get();
 
     public HomePanel(MainWindow main, User user) {
         this.main = main;
@@ -77,17 +75,11 @@ public class HomePanel extends JPanel implements CommunityCard.Listener {
         body.setOpaque(false);
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
 
-        // figure out top matches that they havent joined yet
-        ArrayList<Community> all = communities.getAll();
-        ArrayList<Community> notJoined = new ArrayList<Community>();
-        for (int i = 0; i < all.size(); i++) {
-            if (!communities.isMember(user.getUsername(), all.get(i).getId())) {
-                notJoined.add(all.get(i));
-            }
-        }
-        ArrayList<Community> top = matcher.topMatches(user, notJoined, 6);
+        // the server does the matching and hands back the best communities the
+        // user hasnt joined yet, with the match percent already worked out
+        ArrayList<Community> top = api.homeMatches(user.getUsername());
 
-        body.add(buildHero(countGoodMatches(notJoined)));
+        body.add(buildHero(countGoodMatches(top)));
         body.add(UiHelper.vgap(20));
 
         JLabel section = UiHelper.title("Top picks for you", 17);
@@ -103,7 +95,6 @@ public class HomePanel extends JPanel implements CommunityCard.Listener {
     private int countGoodMatches(ArrayList<Community> list) {
         int n = 0;
         for (int i = 0; i < list.size(); i++) {
-            matcher.scoreFor(user, list.get(i));
             if (list.get(i).getMatchPercent() >= 50) {
                 n++;
             }
@@ -140,8 +131,8 @@ public class HomePanel extends JPanel implements CommunityCard.Listener {
         grid.setAlignmentX(Component.LEFT_ALIGNMENT);
         for (int i = 0; i < list.size(); i++) {
             Community c = list.get(i);
-            boolean member = communities.isMember(user.getUsername(), c.getId());
-            grid.add(new CommunityCard(c, member, true, this));
+            // these are all communities the user hasnt joined yet
+            grid.add(new CommunityCard(c, false, true, this));
         }
         return grid;
     }
@@ -170,7 +161,7 @@ public class HomePanel extends JPanel implements CommunityCard.Listener {
     }
 
     public void join(Community c) {
-        communities.join(user.getUsername(), c.getId());
+        api.join(user.getUsername(), c.getId());
         main.showHome(); // rebuild so the card flips to "Open"
     }
 }

@@ -47,7 +47,7 @@ public class RequestRouter {
             return authHandler.register(request);
         }
         if (action.equals("verify")) {
-            return authHandler.verify(request);
+            return authHandler.verify(request, client, server);
         }
         if (action.equals("resend")) {
             return authHandler.resend(request);

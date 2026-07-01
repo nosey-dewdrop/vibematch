@@ -25,7 +25,7 @@ public class CommunityHandler {
     private UserDao userDao = new UserDao();
 
     public Response list(Request req) {
-        return listResponse(req.id, communities.getAll());
+        return scoredListResponse(req, communities.getAll());
     }
 
     public Response get(Request req) {
@@ -37,11 +37,11 @@ public class CommunityHandler {
     }
 
     public Response byCategory(Request req) {
-        return listResponse(req.id, communities.getByCategory(req.getString("category")));
+        return scoredListResponse(req, communities.getByCategory(req.getString("category")));
     }
 
     public Response search(Request req) {
-        return listResponse(req.id, communities.search(req.getString("text")));
+        return scoredListResponse(req, communities.search(req.getString("text")));
     }
 
     public Response joined(Request req) {
@@ -92,6 +92,21 @@ public class CommunityHandler {
         }
         matcher.scoreFor(user, c);
         return Response.reply(req.id, Json.toJson(c));
+    }
+
+    // like listResponse but fills in each community's match percent for the
+    // user first (if the request carries a username)
+    private Response scoredListResponse(Request req, ArrayList<Community> list) {
+        String username = req.getString("username");
+        if (username != null) {
+            User user = userDao.findByUsername(username);
+            if (user != null) {
+                for (int i = 0; i < list.size(); i++) {
+                    matcher.scoreFor(user, list.get(i));
+                }
+            }
+        }
+        return listResponse(req.id, list);
     }
 
     // helper: send an array of communities

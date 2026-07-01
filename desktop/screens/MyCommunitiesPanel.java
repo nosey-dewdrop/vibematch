@@ -16,7 +16,7 @@ import javax.swing.ScrollPaneConstants;
 
 import model.Community;
 import model.User;
-import service.CommunityService;
+import net.Api;
 import ui.RoundedButton;
 import ui.Theme;
 import ui.UiHelper;
@@ -29,7 +29,7 @@ public class MyCommunitiesPanel extends JPanel implements CommunityCard.Listener
 
     private MainWindow main;
     private User user;
-    private CommunityService communities = new CommunityService();
+    private Api api = Api.get();
 
     public MyCommunitiesPanel(MainWindow main, User user) {
         this.main = main;
@@ -55,7 +55,7 @@ public class MyCommunitiesPanel extends JPanel implements CommunityCard.Listener
         header.setOpaque(false);
         header.setBorder(BorderFactory.createEmptyBorder(0, 0, 14, 0));
 
-        ArrayList<Community> joined = communities.getJoined(user.getUsername());
+        ArrayList<Community> joined = api.joined(user.getUsername());
         JPanel left = new JPanel();
         left.setOpaque(false);
         left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
@@ -82,7 +82,7 @@ public class MyCommunitiesPanel extends JPanel implements CommunityCard.Listener
         JPanel body = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 16));
         body.setOpaque(false);
 
-        ArrayList<Community> joined = communities.getJoined(user.getUsername());
+        ArrayList<Community> joined = api.joined(user.getUsername());
         if (joined.isEmpty()) {
             JPanel empty = new JPanel();
             empty.setOpaque(false);

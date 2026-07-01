@@ -1,8 +1,10 @@
 #!/bin/bash
-# build and run the vibematch desktop app
-# usage: ./run.sh
+# build and run the vibematch desktop CLIENT
+# start the server first (./run-server.sh) in another terminal, then run this.
+#
+# to connect to a server on another computer, pass its address:
+#   ./run.sh 192.168.1.20
 
-# compile everything under desktop/ into build/
 mkdir -p build
 echo "compiling..."
 javac -cp "desktop/lib/*" -d build $(find desktop -name "*.java")
@@ -12,4 +14,4 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "starting vibematch..."
-java -cp "build:desktop/lib/*" app.Main
+java -cp "build:desktop/lib/*" app.Main "$@"

@@ -21,8 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 
-import data.MessageDao;
-import data.UserDao;
+import net.Api;
 import model.Message;
 import model.User;
 import ui.RoundedButton;
@@ -35,12 +34,11 @@ import ui.UiHelper;
  * side is the open conversation with a box to type in. Not real time, it just
  * reloads when you send something.
  */
-public class MessagesPanel extends JPanel {
+public class MessagesPanel extends JPanel implements net.PushListener {
 
     private MainWindow main;
     private User user;
-    private MessageDao messageDao = new MessageDao();
-    private UserDao userDao = new UserDao();
+    private Api api = Api.get();
 
     private String selectedPartner = null;
     private JPanel centerHolder;
@@ -102,7 +100,7 @@ public class MessagesPanel extends JPanel {
 
     private void refreshPartners() {
         partnersHolder.removeAll();
-        ArrayList<String> partners = messageDao.getPartners(user.getUsername());
+        ArrayList<String> partners = api.partners(user.getUsername());
         if (partners.isEmpty()) {
             partnersHolder.add(UiHelper.muted("No chats yet. Tap + to start one.", 12));
         }
@@ -169,7 +167,7 @@ public class MessagesPanel extends JPanel {
         list.setOpaque(false);
         list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
 
-        ArrayList<Message> msgs = messageDao.getConversation(user.getUsername(), selectedPartner);
+        ArrayList<Message> msgs = api.conversation(user.getUsername(), selectedPartner);
         for (int i = 0; i < msgs.size(); i++) {
             Message m = msgs.get(i);
             boolean mine = m.getSender().equals(user.getUsername());
@@ -233,9 +231,27 @@ public class MessagesPanel extends JPanel {
         if (text.isEmpty() || selectedPartner == null) {
             return;
         }
-        messageDao.send(new Message(user.getUsername(), selectedPartner, text));
+        api.sendMessage(user.getUsername(), selectedPartner, text);
         refreshPartners();
         showConversation();
+    }
+
+    /*
+     * The server pushed a message that was sent TO us. This is the real time
+     * bit: if it's from the person we're chatting with right now, reload the
+     * conversation so it appears instantly. Otherwise just refresh the list so
+     * a new chat shows up on the left.
+     */
+    public void onPush(String event, String dataJson) {
+        if (!event.equals("newMessage")) {
+            return;
+        }
+        Message m = protocol.Json.fromJson(dataJson, Message.class);
+        if (selectedPartner != null && m.getSender().equals(selectedPartner)) {
+            showConversation();
+        } else {
+            refreshPartners();
+        }
     }
 
     private void newConversation() {
@@ -251,8 +267,9 @@ public class MessagesPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "You can't message yourself :)");
             return;
         }
-        User other = userDao.findByUsername(name);
-        if (other == null) {
+        try {
+            api.findUser(name);
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(this, "No user called '" + name + "'.");
             return;
         }

@@ -22,12 +22,10 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
-import data.PostDao;
 import model.Community;
 import model.Post;
 import model.User;
-import service.CommunityService;
-import service.MatchService;
+import net.Api;
 import ui.RoundedButton;
 import ui.RoundedPanel;
 import ui.Theme;
@@ -38,14 +36,12 @@ import ui.UiHelper;
  * description, and the forum discussions. Members can start a new post. Clicking
  * a post opens it with its comments.
  */
-public class CommunityDetailPanel extends JPanel {
+public class CommunityDetailPanel extends JPanel implements net.PushListener {
 
     private MainWindow main;
     private User user;
     private Community community;
-    private CommunityService communities = new CommunityService();
-    private MatchService matcher = new MatchService();
-    private PostDao postDao = new PostDao();
+    private Api api = Api.get();
 
     public CommunityDetailPanel(MainWindow main, User user, Community community) {
         this.main = main;
@@ -125,7 +121,7 @@ public class CommunityDetailPanel extends JPanel {
         JLabel name = UiHelper.title(community.getName(), 24);
         left.add(name);
         left.add(UiHelper.vgap(4));
-        matcher.scoreFor(user, community);
+        community.setMatchPercent(api.scoreOne(user.getUsername(), community.getId()).getMatchPercent());
         String meta = community.getMemberCount() + " members  ·  " + community.getCategory()
                 + "  ·  " + community.getMatchPercent() + "% match";
         left.add(UiHelper.muted(meta, 13));
@@ -138,13 +134,13 @@ public class CommunityDetailPanel extends JPanel {
     private JPanel buildJoinButton() {
         JPanel wrap = new JPanel(new java.awt.GridBagLayout());
         wrap.setOpaque(false);
-        boolean member = communities.isMember(user.getUsername(), community.getId());
+        boolean member = api.isMember(user.getUsername(), community.getId());
         if (member) {
             RoundedButton leave = new RoundedButton("Leave", Theme.LILAC_100, Theme.LILAC_700);
             leave.setPreferredSize(new Dimension(120, 42));
             leave.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    communities.leave(user.getUsername(), community.getId());
+                    api.leave(user.getUsername(), community.getId());
                     main.openCommunity(community);
                 }
             });
@@ -154,7 +150,7 @@ public class CommunityDetailPanel extends JPanel {
             join.setPreferredSize(new Dimension(160, 42));
             join.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    communities.join(user.getUsername(), community.getId());
+                    api.join(user.getUsername(), community.getId());
                     main.openCommunity(community);
                 }
             });
@@ -190,7 +186,7 @@ public class CommunityDetailPanel extends JPanel {
         list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
         list.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        ArrayList<Post> posts = postDao.getPostsForCommunity(community.getId());
+        ArrayList<Post> posts = api.posts(community.getId());
         if (posts.isEmpty()) {
             JLabel empty = UiHelper.muted("No posts yet. Be the first to start a discussion!", 14);
             empty.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -228,7 +224,7 @@ public class CommunityDetailPanel extends JPanel {
     }
 
     private void openNewPost() {
-        if (!communities.isMember(user.getUsername(), community.getId())) {
+        if (!api.isMember(user.getUsername(), community.getId())) {
             JOptionPane.showMessageDialog(this,
                 "Join the community first to start a discussion.",
                 "Join to post", JOptionPane.INFORMATION_MESSAGE);
@@ -245,6 +241,17 @@ public class CommunityDetailPanel extends JPanel {
     }
 
     // ---- small helpers ----
+
+    // someone posted or commented in this community, refresh the post list live
+    public void onPush(String event, String dataJson) {
+        if (!event.equals("forumUpdate")) {
+            return;
+        }
+        int communityId = protocol.Json.parse(dataJson).get("communityId").getAsInt();
+        if (communityId == community.getId()) {
+            main.openCommunity(community);
+        }
+    }
 
     private String description() {
         return "<html><div style='width:620px'>" + community.getDescription() + "</div></html>";

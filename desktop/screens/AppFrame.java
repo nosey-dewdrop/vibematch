@@ -45,8 +45,8 @@ public class AppFrame extends JFrame {
         showScreen(new RegisterScreen(this));
     }
 
-    public void showVerify(User user, String code) {
-        showScreen(new VerifyScreen(this, user, code));
+    public void showVerify(String username, String email) {
+        showScreen(new VerifyScreen(this, username, email));
     }
 
     // after a successful login or verify, decide where to send them

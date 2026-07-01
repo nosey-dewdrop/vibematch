@@ -13,10 +13,9 @@ public class CommunityService {
 
     private CommunityDao dao = new CommunityDao();
 
-    // the categories we group communities under (used by discover)
-    public static final String[] CATEGORIES = {
-        "Arts", "Sports", "Tech", "Culture", "Academic", "Social"
-    };
+    // the categories we group communities under (used by discover). the actual
+    // list lives in model.Categories so both sides can see it.
+    public static final String[] CATEGORIES = model.Categories.ALL;
 
     public ArrayList<Community> getAll() {
         return dao.getAll();

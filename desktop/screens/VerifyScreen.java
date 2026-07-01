@@ -16,32 +16,32 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import model.User;
-import service.AuthService;
+import net.Api;
 import ui.RoundedButton;
 import ui.Session;
 import ui.Theme;
 import ui.UiHelper;
-import util.EmailSender;
 
 /*
- * Where the user types the code we emailed them. The expected code is passed in
- * from the register screen. If they get it right we mark them verified and send
- * them into onboarding.
+ * Where the user types the code we emailed them. Now the SERVER is the one that
+ * knows the real code, so we just send what they typed and the server tells us
+ * if it was right. On success we get the (now verified) user back and head into
+ * onboarding.
  */
 public class VerifyScreen extends JPanel {
 
     private AppFrame appFrame;
-    private AuthService auth = new AuthService();
-    private User user;
-    private String expectedCode;
+    private Api api = Api.get();
+    private String username;
+    private String email;
 
     private JTextField codeField = new JTextField();
     private JLabel errorLabel = new JLabel(" ");
 
-    public VerifyScreen(AppFrame appFrame, User user, String code) {
+    public VerifyScreen(AppFrame appFrame, String username, String email) {
         this.appFrame = appFrame;
-        this.user = user;
-        this.expectedCode = code;
+        this.username = username;
+        this.email = email;
 
         JPanel form = new JPanel();
         form.setBackground(Theme.WHITE);
@@ -52,12 +52,11 @@ public class VerifyScreen extends JPanel {
         form.add(title);
         form.add(UiHelper.vgap(6));
 
-        JLabel sub = UiHelper.muted("We sent a 6 digit code to " + user.getEmail(), 13);
+        JLabel sub = UiHelper.muted("We sent a 6 digit code to " + email, 13);
         sub.setAlignmentX(Component.LEFT_ALIGNMENT);
         form.add(sub);
         form.add(UiHelper.vgap(22));
 
-        // the code box. big spaced font so it feels like a code input.
         codeField.setFont(Theme.heading(26));
         codeField.setHorizontalAlignment(JTextField.CENTER);
         JPanel codeBox = UiHelper.field(codeField);
@@ -116,24 +115,26 @@ public class VerifyScreen extends JPanel {
     private void doVerify() {
         errorLabel.setText(" ");
         String typed = codeField.getText().trim();
-        if (typed.equals(expectedCode)) {
-            auth.markVerified(user.getUsername());
-            user.setVerified(true);
+        try {
+            User user = api.verify(username, typed);
             Session.setUser(user);
             appFrame.routeAfterLogin(user);
-        } else {
-            errorLabel.setText("That code isn't right, check again.");
+        } catch (IllegalArgumentException ex) {
+            errorLabel.setText(ex.getMessage());
         }
     }
 
     private void resend() {
-        expectedCode = auth.generateVerificationCode();
-        boolean sent = EmailSender.sendVerificationCode(user.getEmail(), expectedCode);
-        if (!sent) {
-            JOptionPane.showMessageDialog(this,
-                "Here is your new code:\n\n   " + expectedCode,
-                "Verification code",
-                JOptionPane.INFORMATION_MESSAGE);
+        try {
+            Api.ResendResult result = api.resend(username, email);
+            if (!result.emailed) {
+                JOptionPane.showMessageDialog(this,
+                    "Here is your new code:\n\n   " + result.code,
+                    "Verification code",
+                    JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage());
         }
     }
 }

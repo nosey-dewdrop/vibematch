@@ -15,9 +15,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import data.UserDao;
 import model.MbtiResult;
 import model.User;
+import net.Api;
 import service.MbtiService;
 import ui.RoundedButton;
 import ui.RoundedPanel;
@@ -34,7 +34,7 @@ public class MbtiTestPanel extends JPanel {
 
     private AppFrame appFrame;
     private User user;
-    private UserDao userDao = new UserDao();
+    private Api api = Api.get();
     private MbtiService mbti = new MbtiService();
 
     private ArrayList<MbtiService.Question> questions;
@@ -170,8 +170,9 @@ public class MbtiTestPanel extends JPanel {
     }
 
     private void finish() {
-        MbtiResult result = mbti.score(answers);
-        userDao.updateMbti(user.getUsername(), result.getType());
+        // the server scores the answers and stores the type, so the result and
+        // whats saved can never drift apart
+        MbtiResult result = api.submitMbti(user.getUsername(), answers);
         user.setMbtiType(result.getType());
         Session.setUser(user);
         appFrame.showVibeResult(user, result);

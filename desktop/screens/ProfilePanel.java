@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import model.User;
-import service.CommunityService;
+import net.Api;
 import service.MbtiService;
 import ui.RoundedButton;
 import ui.RoundedPanel;
@@ -34,7 +34,7 @@ public class ProfilePanel extends JPanel {
 
     private MainWindow main;
     private User user;
-    private CommunityService communities = new CommunityService();
+    private Api api = Api.get();
     private MbtiService mbti = new MbtiService();
 
     public ProfilePanel(MainWindow main, User user) {
@@ -126,7 +126,7 @@ public class ProfilePanel extends JPanel {
         JPanel row = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
         row.setOpaque(false);
         row.setAlignmentX(Component.CENTER_ALIGNMENT);
-        int joined = communities.getJoined(user.getUsername()).size();
+        int joined = api.joined(user.getUsername()).size();
         row.add(statTile("" + joined, "Communities"));
         String type = user.getMbtiType() == null ? "—" : user.getMbtiType();
         row.add(statTile(type, "Your type"));

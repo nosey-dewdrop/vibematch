@@ -19,8 +19,7 @@ import javax.swing.ScrollPaneConstants;
 
 import model.Community;
 import model.User;
-import service.CommunityService;
-import service.MatchService;
+import net.Api;
 import ui.RoundedButton;
 import ui.Theme;
 import ui.UiHelper;
@@ -34,8 +33,7 @@ public class DiscoverPanel extends JPanel implements CommunityCard.Listener {
 
     private MainWindow main;
     private User user;
-    private CommunityService communities = new CommunityService();
-    private MatchService matcher = new MatchService();
+    private Api api = Api.get();
 
     private JTextField searchField = new JTextField();
     private JPanel gridHolder;
@@ -61,7 +59,7 @@ public class DiscoverPanel extends JPanel implements CommunityCard.Listener {
         scroll.getVerticalScrollBar().setUnitIncrement(16);
         add(scroll, BorderLayout.CENTER);
 
-        showCommunities(communities.getAll());
+        showCommunities(api.listCommunities(user.getUsername()));
     }
 
     private JPanel buildHeader() {
@@ -97,8 +95,8 @@ public class DiscoverPanel extends JPanel implements CommunityCard.Listener {
         row.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         addCategoryButton(row, "All");
-        for (int i = 0; i < CommunityService.CATEGORIES.length; i++) {
-            addCategoryButton(row, CommunityService.CATEGORIES[i]);
+        for (int i = 0; i < model.Categories.ALL.length; i++) {
+            addCategoryButton(row, model.Categories.ALL[i]);
         }
         return row;
     }
@@ -121,9 +119,9 @@ public class DiscoverPanel extends JPanel implements CommunityCard.Listener {
 
     private void refilter() {
         if (activeCategory.equals("All")) {
-            showCommunities(communities.getAll());
+            showCommunities(api.listCommunities(user.getUsername()));
         } else {
-            showCommunities(communities.getByCategory(activeCategory));
+            showCommunities(api.byCategory(user.getUsername(), activeCategory));
         }
         // rebuild header so the active category button updates its color
         removeAll();
@@ -145,9 +143,9 @@ public class DiscoverPanel extends JPanel implements CommunityCard.Listener {
         String text = searchField.getText().trim();
         activeCategory = "All";
         if (text.isEmpty()) {
-            showCommunities(communities.getAll());
+            showCommunities(api.listCommunities(user.getUsername()));
         } else {
-            showCommunities(communities.search(text));
+            showCommunities(api.search(user.getUsername(), text));
         }
     }
 
@@ -160,8 +158,7 @@ public class DiscoverPanel extends JPanel implements CommunityCard.Listener {
         }
         for (int i = 0; i < list.size(); i++) {
             Community c = list.get(i);
-            matcher.scoreFor(user, c);
-            boolean member = communities.isMember(user.getUsername(), c.getId());
+            boolean member = api.isMember(user.getUsername(), c.getId());
             grid.add(new CommunityCard(c, member, true, this));
         }
 
@@ -178,7 +175,7 @@ public class DiscoverPanel extends JPanel implements CommunityCard.Listener {
     }
 
     public void join(Community c) {
-        communities.join(user.getUsername(), c.getId());
+        api.join(user.getUsername(), c.getId());
         refilter();
     }
 }

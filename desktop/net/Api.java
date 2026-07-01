@@ -93,8 +93,9 @@ public class Api {
 
     // ---- communities ----
 
-    public ArrayList<Community> listCommunities() {
-        return toList(client.send("communities.list", Params.of().json()));
+    // username lets the server fill in the match percent for each community
+    public ArrayList<Community> listCommunities(String username) {
+        return toList(client.send("communities.list", Params.of().put("username", username).json()));
     }
 
     public Community getCommunity(int id) {
@@ -102,12 +103,14 @@ public class Api {
         return Json.fromJson(data, Community.class);
     }
 
-    public ArrayList<Community> byCategory(String category) {
-        return toList(client.send("communities.byCategory", Params.of().put("category", category).json()));
+    public ArrayList<Community> byCategory(String username, String category) {
+        return toList(client.send("communities.byCategory", Params.of()
+                .put("username", username).put("category", category).json()));
     }
 
-    public ArrayList<Community> search(String text) {
-        return toList(client.send("communities.search", Params.of().put("text", text).json()));
+    public ArrayList<Community> search(String username, String text) {
+        return toList(client.send("communities.search", Params.of()
+                .put("username", username).put("text", text).json()));
     }
 
     public ArrayList<Community> joined(String username) {

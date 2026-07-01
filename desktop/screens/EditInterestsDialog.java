@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
-import data.UserDao;
+import net.Api;
 import model.Interests;
 import model.User;
 import ui.Chip;
@@ -30,7 +30,7 @@ import ui.UiHelper;
  */
 public class EditInterestsDialog extends JDialog {
 
-    private UserDao userDao = new UserDao();
+    private Api api = Api.get();
     private ArrayList<Chip> chips = new ArrayList<Chip>();
 
     public EditInterestsDialog(Window owner, final User user, final Runnable onSaved) {
@@ -72,7 +72,7 @@ public class EditInterestsDialog extends JDialog {
                         picked.add(Interests.ALL[i]);
                     }
                 }
-                userDao.setInterests(user.getUsername(), picked);
+                api.setInterests(user.getUsername(), picked);
                 user.setInterests(picked);
                 dispose();
                 if (onSaved != null) {
