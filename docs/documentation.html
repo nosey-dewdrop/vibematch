@@ -196,18 +196,6 @@ Layer 6  ui / screens what the user sees</pre>
     <li>The user enters the code; the server compares it and marks the account
       <em>verified</em>. Login is refused until the account is verified.</li>
   </ol>
-  <div class="qa">
-    <p class="q">Why the dialog fallback?</p>
-    <p>Sending real email requires a private password, which is never committed to
-       the repository. The fallback lets the application run and be evaluated on a
-       machine with no email credentials, without exposing any secret.</p>
-  </div>
-  <div class="qa">
-    <p class="q">How is the password stored?</p>
-    <p>Never in plain text. Each user has a random salt, and the stored value is a
-       SHA-256 hash of the salt combined with the password (<code>PasswordUtil</code>).
-       The server never sends the hash to a client.</p>
-  </div>
 
   <h2 id="s6"><span class="num">6</span>Sockets and real-time communication</h2>
   <p class="lead">A socket is a live link to one shared server, so everyone sees the same data and updates arrive instantly.</p>
@@ -241,12 +229,6 @@ ChatServer.pushTo(you, {"type":"push","event":"newMessage",...})
   <p>The server keeps a map of <code>username → socket</code> for connected users, so
      it knows where to deliver a push. Real-time messaging and forum updates use this
      mechanism.</p>
-  <div class="qa">
-    <p class="q">Why plain sockets rather than a framework?</p>
-    <p>They are simpler to explain, have no dependencies, and represent classic socket
-       programming. The same server can later serve a second client (for example an
-       iOS application) without any change to the server itself.</p>
-  </div>
 
   <h2 id="s7"><span class="num">7</span>Friends and privacy</h2>
   <p class="lead">You can only message a friend, and that rule is enforced on the server so it cannot be bypassed.</p>
