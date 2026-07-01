@@ -192,6 +192,27 @@ public class CommunityDao {
         }
     }
 
+    // the usernames of everyone in a community, used by the server to push
+    // forum updates to them
+    public ArrayList<String> getMemberUsernames(int communityId) {
+        ArrayList<String> names = new ArrayList<String>();
+        try {
+            Connection conn = Db.getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                "SELECT username FROM memberships WHERE community_id = ?");
+            ps.setInt(1, communityId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                names.add(rs.getString(1));
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            throw new RuntimeException("could not load member usernames", e);
+        }
+        return names;
+    }
+
     public int memberCount(int communityId) {
         try {
             Connection conn = Db.getConnection();
