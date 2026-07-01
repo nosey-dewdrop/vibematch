@@ -22,6 +22,7 @@ public class Community {
 
     private int memberCount;     // computed
     private int matchPercent;    // computed by MatchService
+    private boolean member;      // is the current user a member (computed per request)
 
     public Community() {
     }
@@ -58,4 +59,7 @@ public class Community {
 
     public int getMatchPercent() { return matchPercent; }
     public void setMatchPercent(int matchPercent) { this.matchPercent = matchPercent; }
+
+    public boolean isMember() { return member; }
+    public void setMember(boolean member) { this.member = member; }
 }

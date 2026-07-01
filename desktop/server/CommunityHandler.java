@@ -91,22 +91,36 @@ public class CommunityHandler {
             return Response.fail(req.id, "not found");
         }
         matcher.scoreFor(user, c);
+        c.setMember(communities.isMember(username, c.getId()));
         return Response.reply(req.id, Json.toJson(c));
     }
 
-    // like listResponse but fills in each community's match percent for the
-    // user first (if the request carries a username)
+    // like listResponse but fills in each community's match percent AND whether
+    // the user is already a member, so the client doesnt have to ask community
+    // by community (that was slow). we load the user's joined ids once here.
     private Response scoredListResponse(Request req, ArrayList<Community> list) {
         String username = req.getString("username");
         if (username != null) {
             User user = userDao.findByUsername(username);
             if (user != null) {
+                ArrayList<Community> mine = communities.getJoined(username);
                 for (int i = 0; i < list.size(); i++) {
-                    matcher.scoreFor(user, list.get(i));
+                    Community c = list.get(i);
+                    matcher.scoreFor(user, c);
+                    c.setMember(containsId(mine, c.getId()));
                 }
             }
         }
         return listResponse(req.id, list);
+    }
+
+    private boolean containsId(ArrayList<Community> list, int id) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getId() == id) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // helper: send an array of communities

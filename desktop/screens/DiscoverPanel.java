@@ -158,8 +158,8 @@ public class DiscoverPanel extends JPanel implements CommunityCard.Listener {
         }
         for (int i = 0; i < list.size(); i++) {
             Community c = list.get(i);
-            boolean member = api.isMember(user.getUsername(), c.getId());
-            grid.add(new CommunityCard(c, member, true, this));
+            // membership already came back with the list, no extra round trip
+            grid.add(new CommunityCard(c, c.isMember(), true, this));
         }
 
         gridHolder.removeAll();

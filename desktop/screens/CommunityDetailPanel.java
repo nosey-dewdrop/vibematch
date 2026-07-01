@@ -46,7 +46,9 @@ public class CommunityDetailPanel extends JPanel implements net.PushListener {
     public CommunityDetailPanel(MainWindow main, User user, Community community) {
         this.main = main;
         this.user = user;
-        this.community = community;
+        // fetch the community once, scored and with membership filled in, so the
+        // rest of the screen doesnt keep asking the server the same things
+        this.community = api.scoreOne(user.getUsername(), community.getId());
 
         setLayout(new BorderLayout());
         setBackground(Theme.BG);
@@ -121,7 +123,6 @@ public class CommunityDetailPanel extends JPanel implements net.PushListener {
         JLabel name = UiHelper.title(community.getName(), 24);
         left.add(name);
         left.add(UiHelper.vgap(4));
-        community.setMatchPercent(api.scoreOne(user.getUsername(), community.getId()).getMatchPercent());
         String meta = community.getMemberCount() + " members  ·  " + community.getCategory()
                 + "  ·  " + community.getMatchPercent() + "% match";
         left.add(UiHelper.muted(meta, 13));
@@ -134,8 +135,7 @@ public class CommunityDetailPanel extends JPanel implements net.PushListener {
     private JPanel buildJoinButton() {
         JPanel wrap = new JPanel(new java.awt.GridBagLayout());
         wrap.setOpaque(false);
-        boolean member = api.isMember(user.getUsername(), community.getId());
-        if (member) {
+        if (community.isMember()) {
             RoundedButton leave = new RoundedButton("Leave", Theme.LILAC_100, Theme.LILAC_700);
             leave.setPreferredSize(new Dimension(120, 42));
             leave.addActionListener(new ActionListener() {
@@ -224,7 +224,7 @@ public class CommunityDetailPanel extends JPanel implements net.PushListener {
     }
 
     private void openNewPost() {
-        if (!api.isMember(user.getUsername(), community.getId())) {
+        if (!community.isMember()) {
             JOptionPane.showMessageDialog(this,
                 "Join the community first to start a discussion.",
                 "Join to post", JOptionPane.INFORMATION_MESSAGE);
