@@ -13,7 +13,7 @@
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{
-    font-family:'Times New Roman', Times, serif; color:var(--ink); margin:0; line-height:1.62;
+    font-family:'Times New Roman', Times, serif; color:var(--ink); margin:0; line-height:1.68; font-size:18px;
     background:radial-gradient(120% 60% at 0% 0%, #efe8fb 0%, transparent 55%),
       radial-gradient(120% 60% at 100% 3%, #ffe7f0 0%, transparent 50%),#f6f2fd;
     -webkit-font-smoothing:antialiased;
@@ -26,16 +26,16 @@
   .cover .meta{font-size:14px;color:var(--ink-soft);margin-top:8px}
   .cover .meta a{color:var(--lilac-600)}
 
-  h2{font-size:24px;font-weight:600;margin:36px 0 6px;border-bottom:1px solid var(--rule);padding-bottom:6px;color:var(--ink)}
-  h2 .num{color:#fff;background:var(--lilac-700);border-radius:8px;padding:1px 9px;font-size:16px;margin-right:10px}
-  h3{font-size:18px;margin:22px 0 4px;font-weight:bold;color:var(--lilac-700)}
+  h2{font-size:30px;font-weight:600;margin:36px 0 6px;border-bottom:1px solid var(--rule);padding-bottom:6px;color:var(--ink)}
+  h2 .num{color:var(--lilac-600);font-size:34px;font-weight:bold;margin-right:14px}
+  h3{font-size:22px;margin:22px 0 4px;font-weight:bold;color:var(--lilac-700)}
   p{margin:9px 0}
   ul,ol{margin:9px 0 9px 22px}
   li{margin:5px 0}
   strong{color:var(--lilac-700)}
   a{color:var(--lilac-600)}
 
-  .toc{font-size:15px;background:var(--lilac-50);border:1px solid var(--rule);border-radius:14px;padding:16px 20px;margin:18px 0}
+  .toc{font-size:17px;background:var(--lilac-50);border:1px solid var(--rule);border-radius:14px;padding:16px 20px;margin:18px 0}
   .toc b{display:block;margin-bottom:6px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--lilac-500)}
   .toc a{display:block;color:var(--ink);text-decoration:none;padding:2px 0}
   .toc a:hover{color:var(--lilac-700);text-decoration:underline}
@@ -48,12 +48,12 @@
   .uml{border:1px solid var(--rule);border-radius:12px;margin:10px 0;overflow:hidden;font-family:'Times New Roman', Times, serif}
   .uml .cn{background:var(--lilac-100);border-bottom:1px solid var(--rule);padding:6px 13px;font-weight:bold;color:var(--lilac-700)}
   .uml .cn small{font-weight:normal;color:var(--ink-soft)}
-  .uml .sec{padding:6px 13px;font-size:13.5px;color:var(--ink-soft)}
+  .uml .sec{padding:7px 14px;font-size:14.5px;color:var(--ink-soft)}
   .uml .sec + .sec{border-top:1px dashed var(--rule)}
   .uml .k{color:var(--lilac-400);font-style:italic}
 
   .qa{background:linear-gradient(135deg,#fff,var(--mint) 260%);border-left:4px solid #5cc09a;border-radius:12px;padding:14px 18px;margin:14px 0}
-  .qa .q{font-weight:bold;color:#2f8a63}
+  .qa .q{font-weight:bold;color:#2f8a63;font-size:17px}
   .note{font-size:13px;color:var(--ink-soft);border-top:1px solid var(--rule);margin-top:40px;padding-top:14px}
   .note a{color:var(--lilac-600)}
   @media print{ body{background:#fff} .page{box-shadow:none;border:none;margin:0;max-width:none} }
@@ -82,7 +82,8 @@
     <a href="#s6">6. Sockets and real-time communication</a>
     <a href="#s7">7. Friends and privacy</a>
     <a href="#s8">8. Notifications</a>
-    <a href="#s9">9. Summary</a>
+    <a href="#swhy">9. Design decisions (why each choice)</a>
+    <a href="#s9">10. Summary</a>
   </div>
 
   <h2 id="s1"><span class="num">1</span>Overview</h2>
@@ -323,7 +324,43 @@ ChatServer.pushTo(you, {"type":"push","event":"newMessage",...})
      when the user logs in later; the live push updates the notification bell's unread
      count immediately for a user who is online.</p>
 
-  <h2 id="s9"><span class="num">9</span>Summary</h2>
+  <h2 id="swhy"><span class="num">9</span>Design decisions</h2>
+  <p>The most common questions about why each part is the way it is.</p>
+
+  <div class="qa"><p class="q">Why SQLite instead of a database server such as MySQL?</p>
+  <p>The whole database is a single file, so there is nothing to install or configure. Anyone can download the project and run it with one command, yet the storage is real and survives restarts. A database server would force every user to install and start it first.</p></div>
+
+  <div class="qa"><p class="q">Why one DAO class per table?</p>
+  <p>All SQL is kept inside the data-access classes, so the rest of the program never sees a query. This means the storage engine could be replaced without touching the rules or the screens, and each class has a single, clear responsibility.</p></div>
+
+  <div class="qa"><p class="q">Why a service layer between the DAOs and the screens?</p>
+  <p>So the screens contain no SQL and no rules. A rule such as “only Bilkent emails may register” lives in exactly one place (<code>AuthService</code>) and is reused everywhere, instead of being copied into each screen.</p></div>
+
+  <div class="qa"><p class="q">Why store a salted hash of the password rather than the password itself?</p>
+  <p>If the database were ever stolen, the real passwords must not be readable. A random per-user salt also makes two identical passwords hash to different values, which defeats precomputed lookup tables. The server never sends the hash to a client either.</p></div>
+
+  <div class="qa"><p class="q">Why send JSON over the socket instead of a custom binary format?</p>
+  <p>JSON is readable, both sides agree on it easily, and new actions can be added without breaking old ones. It also means a future client on another platform (for example an iOS app) can speak to the same server without any change on the server side.</p></div>
+
+  <div class="qa"><p class="q">Why one thread per connected client on the server?</p>
+  <p>So many users can be connected and served at the same time. If a single thread handled everyone, one slow request would block every other user; a thread per client keeps them independent.</p></div>
+
+  <div class="qa"><p class="q">Why push updates instead of the client repeatedly asking (polling)?</p>
+  <p>Polling wastes work and is never truly instant. A push is sent the moment something happens, and it avoids reloading the database in a loop. This is what makes messages and notifications appear in real time.</p></div>
+
+  <div class="qa"><p class="q">Why is the friendship rule enforced on the server, not in the screen?</p>
+  <p>A screen runs on the user’s machine and could be modified or bypassed. The server cannot be, so putting the check in <code>MessageHandler.send()</code> guarantees it always holds — for the current client and any future one.</p></div>
+
+  <div class="qa"><p class="q">Why weight interests (65%) more than personality (35%) in the match score?</p>
+  <p>A shared interest is a concrete, direct signal that two people fit a community; a personality type is a softer signal. The weights are a deliberate, documented choice and can be adjusted in one place (<code>MatchService</code>).</p></div>
+
+  <div class="qa"><p class="q">Why keep verification codes in memory rather than in the database?</p>
+  <p>A code only matters for the few minutes of one sign-up. The server is a single long-running process, so holding the code in memory is simpler and avoids storing throwaway data.</p></div>
+
+  <div class="qa"><p class="q">Why build the networking last, after the app already worked?</p>
+  <p>We first made the logic correct on a single machine, then moved it onto the network. Putting a system that does not yet work onto a network only adds a second source of problems.</p></div>
+
+  <h2 id="s9"><span class="num">10</span>Summary</h2>
   <p>vibematch was built in the direction of its dependencies: model, then storage,
      then rules, then identity, then content, then interaction, then the network, and
      finally the refinements. No component was built before the component it depends
