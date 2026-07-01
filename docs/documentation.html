@@ -74,6 +74,7 @@
 
   <div class="toc">
     <b>Contents</b>
+    <a href="#story">The story — how we developed it</a>
     <a href="#s1">1. Overview</a>
     <a href="#s2">2. Design approach — dependency-first</a>
     <a href="#s3">3. Build order (what we built, and why in this order)</a>
@@ -85,6 +86,55 @@
     <a href="#swhy">9. Design decisions (why each choice)</a>
     <a href="#s9">10. Summary</a>
   </div>
+
+  <h2 id="story">The story — how we developed it</h2>
+  <p>We did not start by drawing screens. We started by asking a simpler question:
+     <em>what are we actually storing?</em> A user, a community, a post, a message.
+     So the very first thing we wrote was those plain data classes — the
+     <strong>model</strong>. Nothing on the screen yet, but everything the app would
+     ever do depends on these, so they had to exist first.</p>
+
+  <p>Once we knew the shapes of our data, we could give them a home: an
+     <strong>SQLite database</strong>, with one small <strong>DAO class per table</strong>
+     holding all the SQL. We deliberately kept every query inside those classes, so the
+     rest of the program would never touch SQL directly. On top of that we added the
+     <strong>rules</strong> — the services — where decisions live, like “only Bilkent
+     emails may register.” This gave us a clean stack from the ground up: data, then
+     storage, then rules.</p>
+
+  <p>Then came the first real feature, and we chose it on purpose: <strong>identity</strong>.
+     Register, log in, verify the email. We built this before anything social because,
+     without a user, nothing has an owner — whose message is it, whose membership, whose
+     match? Identity is the backbone that everything else hangs from.</p>
+
+  <p>With users in place, we built the experience in the order the pieces depend on each
+     other: first <strong>onboarding</strong> (interests and the vibe test), because the
+     matching needs that; then the <strong>communities</strong> and the matched feed;
+     then the <strong>forum</strong> inside each community; then <strong>direct
+     messages</strong>. Each feature leaned on the one before it, so nothing was ever
+     built on top of something that did not yet exist.</p>
+
+  <p>At this point we had a complete app — but only on one computer. Using it made the
+     next problem obvious: a community is nothing if people can’t share it. Two students
+     on two laptops each had their own separate copy of the data. That was the turning
+     point. We moved everything behind a <strong>server we wrote ourselves with plain
+     Java sockets</strong>, so there would be one shared database, and so the server
+     could <strong>push</strong> a new message or notification to a user the instant it
+     happened — instead of the app constantly re-asking. We built this networking layer
+     late on purpose: it is much easier to put a system that already works onto a network
+     than to debug logic and networking at the same time.</p>
+
+  <p>The last decisions came from actually living with the app. We noticed anyone could
+     message anyone, which felt wrong, so we added a <strong>friend system</strong> and
+     made messaging private — you can only DM a friend, and the rule is enforced on the
+     server so it can’t be bypassed. It felt like there was no feedback when something
+     happened, so we added <strong>notifications</strong> with a live bell. And because a
+     remote server means every action waits on the network, we moved those calls off the
+     UI thread so the window never freezes.</p>
+
+  <p>That is the whole through-line: we built <strong>bottom-up, brick by brick</strong>,
+     and never laid a brick before the one it rests on. Every step in the story is a
+     single commit on GitHub, in this exact order — the history is the proof.</p>
 
   <h2 id="s1"><span class="num">1</span>Overview</h2>
   <p>vibematch is a community application for Bilkent University students. A user
