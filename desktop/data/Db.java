@@ -29,6 +29,9 @@ public class Db {
             // sqlite has foreign keys off by default, turn them on
             Statement pragma = connection.createStatement();
             pragma.execute("PRAGMA foreign_keys = ON");
+            // when two clients hit the db at the same moment, wait a bit instead
+            // of failing straight away with "database is locked"
+            pragma.execute("PRAGMA busy_timeout = 5000");
             pragma.close();
 
             createTables();

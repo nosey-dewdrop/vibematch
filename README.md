@@ -1,5 +1,7 @@
 # vibematch
 
+**Documentation & class diagram:** https://nosey-dewdrop.github.io/vibematch/
+
 A community app for Bilkent students. You sign up with your Bilkent email, pick the
 things you are into, take a short personality test, and the app matches you with
 communities (clubs, societies, study circles) that fit your vibe. Each community has
