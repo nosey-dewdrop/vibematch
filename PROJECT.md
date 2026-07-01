@@ -51,7 +51,15 @@ now a client. Real time DMs + forum working and tested. See RAPOR.md.
 - [x] live push for forum posts/comments
 - [ ] deploy the server to a free cloud machine (Oracle) so it runs 24/7
 
-### Phase 8: iOS (later)
+### Phase 8: Speed, friends, notifications
+- [x] cut extra round trips (membership comes with the community list)
+- [x] load home and discover in the background so the ui never freezes
+- [x] friends system: requests, accept/decline
+- [x] privacy: you can only message your friends
+- [x] notifications: bell with live unread count + list
+- [ ] apply background loading to the rest of the screens too
+
+### Phase 9: iOS (later)
 - [ ] swiftui client that connects to the same server over sockets
 
 ## How to run
