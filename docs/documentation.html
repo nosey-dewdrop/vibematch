@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>vibematch — Technical Documentation</title>
+<title>vibematch, Technical Documentation</title>
 <style>
   :root{
     --lilac-50:#f6f2fd;--lilac-100:#efe8fb;--lilac-200:#e2d5f6;--lilac-300:#cfb9ee;
@@ -74,9 +74,9 @@
 
   <div class="toc">
     <b>Contents</b>
-    <a href="#story">The story — how we developed it</a>
+    <a href="#story">The story, how we developed it</a>
     <a href="#s1">1. Overview</a>
-    <a href="#s2">2. Design approach — dependency-first</a>
+    <a href="#s2">2. Design approach: dependency-first</a>
     <a href="#s3">3. Build order (what we built, and why in this order)</a>
     <a href="#s4">4. Architecture and class reference</a>
     <a href="#s5">5. Email verification</a>
@@ -87,54 +87,34 @@
     <a href="#s9">10. Summary</a>
   </div>
 
-  <h2 id="story">The story — how we developed it</h2>
-  <p>We did not start by drawing screens. We started by asking a simpler question:
-     <em>what are we actually storing?</em> A user, a community, a post, a message.
-     So the very first thing we wrote was those plain data classes — the
-     <strong>model</strong>. Nothing on the screen yet, but everything the app would
-     ever do depends on these, so they had to exist first.</p>
-
-  <p>Once we knew the shapes of our data, we could give them a home: an
-     <strong>SQLite database</strong>, with one small <strong>DAO class per table</strong>
-     holding all the SQL. We deliberately kept every query inside those classes, so the
-     rest of the program would never touch SQL directly. On top of that we added the
-     <strong>rules</strong> — the services — where decisions live, like “only Bilkent
-     emails may register.” This gave us a clean stack from the ground up: data, then
-     storage, then rules.</p>
-
-  <p>Then came the first real feature, and we chose it on purpose: <strong>identity</strong>.
-     Register, log in, verify the email. We built this before anything social because,
-     without a user, nothing has an owner — whose message is it, whose membership, whose
-     match? Identity is the backbone that everything else hangs from.</p>
-
-  <p>With users in place, we built the experience in the order the pieces depend on each
-     other: first <strong>onboarding</strong> (interests and the vibe test), because the
-     matching needs that; then the <strong>communities</strong> and the matched feed;
-     then the <strong>forum</strong> inside each community; then <strong>direct
-     messages</strong>. Each feature leaned on the one before it, so nothing was ever
-     built on top of something that did not yet exist.</p>
-
-  <p>At this point we had a complete app — but only on one computer. Using it made the
-     next problem obvious: a community is nothing if people can’t share it. Two students
-     on two laptops each had their own separate copy of the data. That was the turning
-     point. We moved everything behind a <strong>server we wrote ourselves with plain
-     Java sockets</strong>, so there would be one shared database, and so the server
-     could <strong>push</strong> a new message or notification to a user the instant it
-     happened — instead of the app constantly re-asking. We built this networking layer
-     late on purpose: it is much easier to put a system that already works onto a network
-     than to debug logic and networking at the same time.</p>
-
-  <p>The last decisions came from actually living with the app. We noticed anyone could
-     message anyone, which felt wrong, so we added a <strong>friend system</strong> and
-     made messaging private — you can only DM a friend, and the rule is enforced on the
-     server so it can’t be bypassed. It felt like there was no feedback when something
-     happened, so we added <strong>notifications</strong> with a live bell. And because a
-     remote server means every action waits on the network, we moved those calls off the
-     UI thread so the window never freezes.</p>
-
-  <p>That is the whole through-line: we built <strong>bottom-up, brick by brick</strong>,
-     and never laid a brick before the one it rests on. Every step in the story is a
-     single commit on GitHub, in this exact order — the history is the proof.</p>
+  <h2 id="story">The story: how we developed it</h2>
+  <p>We did not start with screens. We started by asking what we are storing: a user,
+     a community, a post, a message. So the first thing we wrote was those plain data
+     classes, the model. Nothing was on screen yet, but everything depends on them, so
+     they came first.</p>
+  <p>Next we gave the data a home: an SQLite database, with one DAO class per table
+     holding all the SQL, so nothing else ever touches a query. On top we added the
+     services, where the rules live, like "only Bilkent emails may register." That gave
+     us a clean stack: data, storage, rules.</p>
+  <p>The first feature was identity: register, log in, verify the email. We built it
+     before anything social because without a user nothing has an owner. Then we added
+     the rest in dependency order: onboarding (interests and the vibe test), communities
+     and the matched feed, the community forum, and direct messages. Each one needed the
+     previous one.</p>
+  <p>Now the app worked, but only on one computer. Using it showed the real problem: two
+     students on two laptops each had their own copy of the data, and a community is
+     nothing if people cannot share it. So we moved everything behind a server we wrote
+     with plain Java sockets, giving one shared database and letting the server push new
+     messages and notifications the moment they happen. We did this late on purpose,
+     because putting a working system on a network is easier than debugging the logic and
+     the networking at the same time.</p>
+  <p>The last pieces came from using the app. Anyone could message anyone, which felt
+     wrong, so we added friends and made messaging private, enforced on the server. There
+     was no feedback when something happened, so we added notifications with a live bell.
+     And since a remote server makes every action wait on the network, we moved those
+     calls off the UI thread so nothing freezes.</p>
+  <p>Through all of it we built bottom up, brick by brick, never laying a brick before the
+     one it rests on. Every step is one commit on GitHub, in this order.</p>
 
   <h2 id="s1"><span class="num">1</span>Overview</h2>
   <p>vibematch is a community application for Bilkent University students. A user
@@ -149,10 +129,10 @@
      network socket. This document explains what was built, in what order, and the
      reasoning behind each decision.</p>
 
-  <h2 id="s2"><span class="num">2</span>Design approach — dependency-first</h2>
+  <h2 id="s2"><span class="num">2</span>Design approach: dependency-first</h2>
   <p>The whole system was built <strong>bottom-up</strong>, following one rule:
      <em>a component is never built before the components it depends on.</em> This is
-     the same logic as constructing a building — the foundation is poured before the
+     the same logic as constructing a building, the foundation is poured before the
      walls are raised, and the plumbing is installed before the painting.</p>
   <p>The code is organised into layers, and <strong>each layer depends only on the
      layer below it</strong>. This keeps the system maintainable: a change in one
@@ -181,9 +161,9 @@ Layer 6  ui / screens what the user sees</pre>
     <li><strong>Services (rules).</strong> AuthService (Bilkent-email rule),
       MatchService (scoring), MbtiService. Built once data access existed, so rules
       could be layered on top of it.</li>
-    <li><strong>Identity — the first real feature.</strong> Register, login, email
+    <li><strong>Identity, the first real feature.</strong> Register, login, email
       verification. Built first among features because, without a user, nothing has
-      an owner — no message, no membership, no match. Identity is the backbone.</li>
+      an owner, no message, no membership, no match. Identity is the backbone.</li>
     <li><strong>Onboarding, communities, forum, messages.</strong> In this order,
       because matching needs the vibe, the forum needs communities, and messaging
       needs users. Each feature depends on the previous one.</li>
@@ -198,7 +178,7 @@ Layer 6  ui / screens what the user sees</pre>
   <p>The main classes, grouped by layer. Notation: <code>-</code> private field,
      <code>+</code> public method.</p>
 
-  <h3>Layer 1 — model</h3>
+  <h3>Layer 1, model</h3>
   <div class="uml">
     <div class="cn">User <small>· model</small></div>
     <div class="sec">- username, displayName, email, passHash, salt, bio, verified, mbtiType, interests[]</div>
@@ -220,7 +200,7 @@ Layer 6  ui / screens what the user sees</pre>
     <div class="sec">Notification: - id, username, type, text, createdAt, read</div>
   </div>
 
-  <h3>Layer 2 — data (SQL only here)</h3>
+  <h3>Layer 2, data (SQL only here)</h3>
   <div class="uml">
     <div class="cn">Db <small>· SQLite</small></div>
     <div class="sec">+ connect() &nbsp; + getConnection() &nbsp; + close() &nbsp; <span class="k">// creates all tables</span></div>
@@ -241,7 +221,7 @@ Layer 6  ui / screens what the user sees</pre>
     <div class="sec">NotificationDao: + insert() + forUser() + unreadCount() + markAllRead()</div>
   </div>
 
-  <h3>Layer 3 — service (rules)</h3>
+  <h3>Layer 3, service (rules)</h3>
   <div class="uml">
     <div class="cn">AuthService &nbsp;/&nbsp; MatchService &nbsp;/&nbsp; MbtiService &nbsp;/&nbsp; CommunityService</div>
     <div class="sec">AuthService: + register() + login() + markVerified() + generateVerificationCode()</div>
@@ -250,7 +230,7 @@ Layer 6  ui / screens what the user sees</pre>
     <div class="sec">CommunityService: + getAll() + search() + join() + leave() + getJoined() + isMember()</div>
   </div>
 
-  <h3>Layer 4 — server (network + concurrency)</h3>
+  <h3>Layer 4, server (network + concurrency)</h3>
   <div class="uml">
     <div class="cn">ChatServer</div>
     <div class="sec">- online { username &rarr; handler }</div>
@@ -272,7 +252,7 @@ Layer 6  ui / screens what the user sees</pre>
     <div class="sec">Notifier + notify() &nbsp;·&nbsp; Dto + safeUser() <span class="k">// strips the password hash</span></div>
   </div>
 
-  <h3>Layer 5 — net (client bridge)</h3>
+  <h3>Layer 5, net (client bridge)</h3>
   <div class="uml">
     <div class="cn">Api <small>· facade</small> &nbsp;/&nbsp; ServerClient <small>· singleton</small></div>
     <div class="sec">Api: + login() + homeMatches() + posts() + sendMessage() + sendFriendRequest() + notifications() ...</div>
@@ -280,7 +260,7 @@ Layer 6  ui / screens what the user sees</pre>
     <div class="sec">protocol: Request(id, action, data), Response(type, ok, error, event, data), Json, Params</div>
   </div>
 
-  <h3>Layer 6 — ui / screens</h3>
+  <h3>Layer 6, ui / screens</h3>
   <div class="uml">
     <div class="cn">Screens (Java Swing JPanels)</div>
     <div class="sec">MainWindow: + navigate() + openCommunity() + onPush() <span class="k">// forwards a push to the open screen</span></div>
@@ -319,7 +299,7 @@ Layer 6  ui / screens what the user sees</pre>
   <h2 id="s6"><span class="num">6</span>Sockets and real-time communication</h2>
   <p><strong>What a socket is.</strong> A socket is a persistent two-way connection
      between two programs over a network. Once open, either side may send data at any
-     time — comparable to a telephone call that stays connected, rather than sending
+     time, comparable to a telephone call that stays connected, rather than sending
      a single letter and waiting for a reply.</p>
   <p><strong>Why it is needed.</strong> A community application has many users on
      different computers who must see the same data. This requires (a) a single
@@ -399,7 +379,7 @@ ChatServer.pushTo(you, {"type":"push","event":"newMessage",...})
   <p>Polling wastes work and is never truly instant. A push is sent the moment something happens, and it avoids reloading the database in a loop. This is what makes messages and notifications appear in real time.</p></div>
 
   <div class="qa"><p class="q">Why is the friendship rule enforced on the server, not in the screen?</p>
-  <p>A screen runs on the user’s machine and could be modified or bypassed. The server cannot be, so putting the check in <code>MessageHandler.send()</code> guarantees it always holds — for the current client and any future one.</p></div>
+  <p>A screen runs on the user’s machine and could be modified or bypassed. The server cannot be, so putting the check in <code>MessageHandler.send()</code> guarantees it always holds, for the current client and any future one.</p></div>
 
   <div class="qa"><p class="q">Why weight interests (65%) more than personality (35%) in the match score?</p>
   <p>A shared interest is a concrete, direct signal that two people fit a community; a personality type is a softer signal. The weights are a deliberate, documented choice and can be adjusted in one place (<code>MatchService</code>).</p></div>
