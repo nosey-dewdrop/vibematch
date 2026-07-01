@@ -14,37 +14,27 @@ import javax.mail.internet.MimeMessage;
 /*
  * Sends the verification code email over SMTP (gmail by default).
  *
- * Reading the credentials from desktop/credentials.properties keeps the
- * password out of the code and out of git. If that file is missing, or sending
- * fails for any reason, sendVerificationCode just returns false and the caller
- * shows the code in a popup instead. That way the app still works for testing
- * even with no email set up.
+ * Credentials come from environment variables first (VIBEMATCH_EMAIL_SENDER /
+ * VIBEMATCH_EMAIL_PASSWORD / VIBEMATCH_SMTP_HOST / VIBEMATCH_SMTP_PORT), which
+ * is how the cloud server should be configured, with no secret sitting on disk.
+ * If those arent set we fall back to desktop/credentials.properties for local
+ * dev. If neither is present, or sending fails, sendVerificationCode returns
+ * false and the caller shows the code in a popup so the app still works.
  */
 public class EmailSender {
 
     private static final String CREDS_FILE = "desktop/credentials.properties";
 
     public static boolean isConfigured() {
-        Properties p = loadCreds();
-        if (p == null) {
-            return false;
-        }
-        String sender = p.getProperty("email.sender");
-        String pass = p.getProperty("email.password");
-        return notBlank(sender) && notBlank(pass);
+        return notBlank(sender()) && notBlank(password());
     }
 
     // returns true if the mail actually went out, false if we couldnt send it
     public static boolean sendVerificationCode(String toEmail, String code) {
-        Properties creds = loadCreds();
-        if (creds == null) {
-            return false;
-        }
-
-        final String sender = creds.getProperty("email.sender");
-        final String password = creds.getProperty("email.password");
-        String host = creds.getProperty("email.smtp.host", "smtp.gmail.com");
-        String port = creds.getProperty("email.smtp.port", "587");
+        final String sender = sender();
+        final String password = password();
+        String host = host();
+        String port = port();
 
         if (!notBlank(sender) || !notBlank(password)) {
             return false;
@@ -76,6 +66,40 @@ public class EmailSender {
             System.out.println("email send failed: " + e.getMessage());
             return false;
         }
+    }
+
+    // each setting: environment variable wins, else the properties file, else
+    // a sensible default for the smtp bits
+
+    private static String sender() {
+        return pick("VIBEMATCH_EMAIL_SENDER", "email.sender", null);
+    }
+
+    private static String password() {
+        return pick("VIBEMATCH_EMAIL_PASSWORD", "email.password", null);
+    }
+
+    private static String host() {
+        return pick("VIBEMATCH_SMTP_HOST", "email.smtp.host", "smtp.gmail.com");
+    }
+
+    private static String port() {
+        return pick("VIBEMATCH_SMTP_PORT", "email.smtp.port", "587");
+    }
+
+    private static String pick(String envKey, String fileKey, String fallback) {
+        String env = System.getenv(envKey);
+        if (notBlank(env)) {
+            return env;
+        }
+        Properties p = loadCreds();
+        if (p != null) {
+            String v = p.getProperty(fileKey);
+            if (notBlank(v)) {
+                return v;
+            }
+        }
+        return fallback;
     }
 
     private static Properties loadCreds() {
